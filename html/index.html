@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>LLM</title>
+        <link rel="stylesheet", href="login.css">
+    </head>
+    <body>
+        <header> 
+            <h1>LLM Chatbot</h1>
+        </header>
+        <section class="container">
+            <form id="my-form">
+                <div class="msg">For login, use your own ID which should represent your identity.</div>
+                <div class="input">
+                    <label for="userId">User Id:</label>
+                    <input type="text" id="userId">
+                    <br><text>Parallel Processing: </text>
+                    <select name="multiRegion" id="multiRegion">
+                        <option value="disable" selected>Disable</option>
+                        <option value="enable">Enable</option>
+                    </select>
+                    <br><text>Grading: </text>
+                    <select name="gradeMode" id="gradeMode">
+                        <option value="LLM" selected>LLM</option>
+                        <option value="PRIORITY_SEARCH">PRIORITY SEARCH</option>
+                        <option value="NONE">NONE</option>
+                    </select>
+                    <br><text>Conversation Type: </text>
+                    <select name="conversationType" id="convtype">
+                        <option type="text" value="normal" selected>1-1. General Conversation</option>
+                        <option value="rag-opensearch">1-2. RAG OpenSearch</option>
+                        <option value="rag-opensearch-chat">1-3. RAG OpenSearch Chat</option>
+                        
+                        <option value="agent-executor">2-1. Agent Executor (LangGraph)</option>
+                        <option value="agent-executor-chat">2-2. Agent Executor Chat (LangGraph)</option>    
+                        <option value="agent-executor2">2-3. Agent Executor v2 (LangGraph)</option>
+                                            
+                        <option value="agent-crag">3-1. Corrective RAG</option>
+                        <option value="agent-srag">3-2. Self RAG</option>
+                        <option value="agent-scrag">3-3. Self-Corrective RAG</option>   
+                        
+                        <option value="rag-knowledge-base">4-1. Knowledge Base (RAG) </option>   
+                        <option value="prompt-flow">4-2. Prompt Flow </option>                           
+                        <option value="prompt-flow-chat">4-3. Prompt Flow Chat</option>                           
+                        <option value="rag-prompt-flow">4-4. Prompt Flow (RAG) </option>                           
+                        <option value="bedrock-agent">4-5. Bedrock Agent</option>
+
+                        <option value="rag-with-reflection">4-6. RAG with Reflection</option>
+                        <option value="rag-with-transformation">4-7. RAG with Transformation</option>
+
+                        <option value="agent-essay-writer">5-1. Essay Writer</option>                           
+                        <option value="agent-reflection">5-2. Reflection Agent</option>
+                        <option value="agent-knowledge-guru">5-3. Knowledge-guru</option>   
+                        <option value="multi-agent-tool">5-4. Multi Agent Tool</option>   
+                        <option value="writing-agent">5-5. Writing Agent</option>                           
+                        <option value="long-form-writing-agent">5-6. Long Form Writing</option>                           
+                        <option value="agent-plan-and-execute">5-7. Plan and Execution</option>
+                        <option value="data-enrichment-agent">5-8. Data Enrichment Agent</option>
+
+                        <option value="translation">6. Translation</option>
+                        <option value="grammar">7. Grammatical Error Correction</option>
+
+
+                    </select>
+                </div>
+                <input class="btn" type="submit" value="Submit">                
+            </form>
+        </section>        
+        <script src="login.js"></script>
+    </body>
+</html>
+

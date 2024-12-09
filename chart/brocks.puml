@@ -1,0 +1,34 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+skinparam wrapWidth 200
+skinparam maxMessageSize 200
+
+LAYOUT_WITH_LEGEND()
+
+System(start, "Start")
+
+'Container(www, "Web Site")
+
+
+Container(retrieve, "retrieve")
+'Container(retrieve, "SPA", "Container: ReactJS / JavaScript", "Runs application code in customer's browser")
+
+Rel(start, retrieve, "search")
+
+Container(generate, "generate")
+
+Container(websearch, "web search")
+
+Container(rewrite, "rewrite")
+
+
+Rel(retrieve, generate, "generate")
+
+Rel(generate, start, "generate")
+
+' fight the layout engine
+'auth -[hidden]right-> shop
+
+
+@enduml
