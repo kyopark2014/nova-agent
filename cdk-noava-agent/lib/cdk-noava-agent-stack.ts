@@ -24,7 +24,7 @@ const accountId = process.env.CDK_DEFAULT_ACCOUNT;
 const debug = false;
 const stage = 'dev';
 const s3_prefix = 'docs';
-const projectName = `langgraph-agent`; 
+const projectName = `nova-agent`; 
 
 const opensearch_account = "admin";
 const opensearch_passwd = "Wifi1234!";
