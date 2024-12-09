@@ -646,11 +646,8 @@ def general_conversation(connectionId, requestId, chat, query):
             }
         )
         msg = readStreamMsg(connectionId, requestId, stream.content)    
+        print('msg: ', msg)
         
-        usage = stream.response_metadata['usage']
-        print('prompt_tokens: ', usage['prompt_tokens'])
-        print('completion_tokens: ', usage['completion_tokens'])
-        print('total_tokens: ', usage['total_tokens'])
         msg = stream.content
 
     except Exception:
