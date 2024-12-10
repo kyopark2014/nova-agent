@@ -45,6 +45,11 @@ const vectorIndexName = projectName
 
 const nova_pro = [
   {
+    "bedrock_region": "us-east-2", // Ohio
+    "model_type": "nova",
+    "model_id": "amazon.nova-pro-v1:0"
+  },
+  {
     "bedrock_region": "us-east-1", // N.Virginia
     "model_type": "nova",
     "model_id": "amazon.nova-pro-v1:0"
@@ -53,7 +58,7 @@ const nova_pro = [
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "nova",
     "model_id": "amazon.nova-pro-v1:0"
-  },
+  },  
   {
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "nova",
