@@ -845,7 +845,7 @@ def get_current_time(format: str=f"%Y-%m-%d %H:%M:%S")->str:
     
     format = format.replace('\'','')
     timestr = datetime.datetime.now(timezone('Asia/Seoul')).strftime(format)
-    # print('timestr:', timestr)
+    print('timestr:', timestr)
     
     return timestr
 
