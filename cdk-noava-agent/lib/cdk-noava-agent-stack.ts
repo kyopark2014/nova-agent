@@ -48,7 +48,17 @@ const nova_pro = [
     "bedrock_region": "us-east-1", // N.Virginia
     "model_type": "nova",
     "model_id": "amazon.nova-pro-v1:0"
-  }
+  },
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "nova",
+    "model_id": "amazon.nova-pro-v1:0"
+  },
+  // {
+  //   "bedrock_region": "us-west-2", // Oregon
+  //   "model_type": "nova",
+  //   "model_id": "us.amazon.nova-pro-v1:0"
+  // }
 ];
 
 const titan_embedding_v1 = [
