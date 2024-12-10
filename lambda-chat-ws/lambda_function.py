@@ -646,7 +646,6 @@ def general_conversation(connectionId, requestId, chat, query):
             }
         )
         msg = readStreamMsg(connectionId, requestId, stream.content)    
-        print('msg: ', msg)
         
         msg = stream.content
 
@@ -2004,13 +2003,17 @@ def run_agent_executor(connectionId, requestId, query):
     }
     
     message = ""
-    for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
-        # print('event: ', event)
+    # for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
+    #     # print('event: ', event)
         
-        message = event["messages"][-1]
-        # print('message: ', message)
+    #     message = event["messages"][-1]
+    #     # print('message: ', message)
 
-    msg = readStreamMsg(connectionId, requestId, message.content)
+    # msg = readStreamMsg(connectionId, requestId, message.content)
+    output = app.invoke(inputs, config)
+    print('output: ', output)
+    
+    msg  = output
 
     #return msg[msg.find('<result>')+8:len(msg)-9]
     return msg
