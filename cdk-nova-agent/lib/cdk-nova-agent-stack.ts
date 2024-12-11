@@ -37,28 +37,9 @@ const enableParallelSummary = 'true';
 const supportedFormat = JSON.stringify(["pdf", "txt", "csv", "pptx", "ppt", "docx", "doc", "xlsx", "py", "js", "md", "jpeg", "jpg", "png"]);  
 const separated_chat_history = 'true';
 const enableParentDocumentRetrival = 'true';
-
-const prompt_flow_name = 'aws-bot'
-const rag_prompt_flow_name = 'rag-prompt-flow'
-const knowledge_base_name = 'aws-rag'
 const vectorIndexName = projectName
 
 const nova_pro = [
-  {
-    "bedrock_region": "us-east-2", // Ohio
-    "model_type": "nova",
-    "model_id": "amazon.nova-pro-v1:0"
-  },
-  {
-    "bedrock_region": "us-east-1", // N.Virginia
-    "model_type": "nova",
-    "model_id": "amazon.nova-pro-v1:0"
-  },
-  {
-    "bedrock_region": "us-west-2", // Oregon
-    "model_type": "nova",
-    "model_id": "amazon.nova-pro-v1:0"
-  },  
   {
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "nova",
@@ -71,6 +52,14 @@ const titan_embedding_v1 = [
     "bedrock_region": "us-west-2", // Oregon
     "model_type": "titan",
     "model_id": "amazon.titan-embed-text-v1"
+  }
+];
+
+const titan_embedding_v2_single = [  // dimension = 1024
+  {
+    "bedrock_region": "us-west-2", // Oregon
+    "model_type": "titan",
+    "model_id": "amazon.titan-embed-text-v2:0"
   }
 ];
 
@@ -104,7 +93,7 @@ const titan_embedding_v2 = [  // dimension = 1024
 
 const LLM_for_chat = nova_pro; 
 const LLM_for_multimodal = nova_pro;
-const LLM_embedding = titan_embedding_v2;
+const LLM_embedding = titan_embedding_v2_single;
 
 export class CdkNovaAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -609,9 +598,6 @@ export class CdkNovaAgentStack extends cdk.Stack {
         separated_chat_history: separated_chat_history,
         enableParentDocumentRetrival: enableParentDocumentRetrival,
         enableHybridSearch: enableHybridSearch,
-        prompt_flow_name: prompt_flow_name,
-        rag_prompt_flow_name: rag_prompt_flow_name,
-        knowledge_base_name: knowledge_base_name,
         vectorIndexName: vectorIndexName
       }
     });     
