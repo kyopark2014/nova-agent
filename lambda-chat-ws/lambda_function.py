@@ -1257,14 +1257,13 @@ def retrieve_from_knowledge_base(query):
         )
         print('response: ', response)
                 
-        if "knowledgeBaseSummaries" in response:
-            summaries = response["knowledgeBaseSummaries"]
-            for summary in summaries:
-                if summary["name"] == knowledge_base_name:
-                    knowledge_base_id = summary["knowledgeBaseId"]
-                    print('knowledge_base_id: ', knowledge_base_id)
-                    break
-    
+        summaries = response["knowledgeBaseSummaries"]
+        for summary in summaries:
+            if summary["name"] == knowledge_base_name:
+                knowledge_base_id = summary["knowledgeBaseId"]
+                print('knowledge_base_id: ', knowledge_base_id)
+                break
+
     relevant_docs = []
     if knowledge_base_id:    
         retriever = AmazonKnowledgeBasesRetriever(
