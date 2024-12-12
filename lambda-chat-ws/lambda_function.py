@@ -851,7 +851,7 @@ def get_system_time() -> str:
     print('jsonBody: ', jsonBody)    
     timestr = jsonBody['timestr']
     print('timestr: ', timestr)
-    
+     
     return timestr
 
 @tool
