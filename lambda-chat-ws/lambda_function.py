@@ -1469,7 +1469,7 @@ def retrieve(question):
         relevant_documents = get_documents_from_opensearch(vectorstore_opensearch, question, top_k)
 
         for i, document in enumerate(relevant_documents):
-            print(f'## Document(opensearch-vector) {i+1}: {json.dumps(document)}')
+            print(f'## Document(opensearch-vector) {i+1}: {document}')
             
             parent_doc_id = document[0].metadata['parent_doc_id']
             doc_level = document[0].metadata['doc_level']
