@@ -40,12 +40,31 @@ opensearch_url = os.environ.get('opensearch_url')
 sqsUrl = os.environ.get('sqsUrl')
 doc_prefix = s3_prefix+'/'
 LLM_for_chat = json.loads(os.environ.get('LLM_for_chat'))
-LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
 LLM_embedding = json.loads(os.environ.get('LLM_embedding'))
 selected_chat = 0
 selected_multimodal = 0
 selected_embedding = 0
 maxOutputTokens = 4096
+
+# LLM_for_multimodal= json.loads(os.environ.get('LLM_for_multimodal'))
+LLM_for_multimodal = [   # Nova Pro
+    {   
+        "bedrock_region": "us-west-2", # Oregon
+        "model_type": "nova",
+        "model_id": "us.amazon.nova-pro-v1:0"
+    },
+    {
+        "bedrock_region": "us-east-1", # N.Virginia
+        "model_type": "nova",
+        "model_id": "us.amazon.nova-pro-v1:0"
+    },
+    {
+        "bedrock_region": "us-east-2", # Ohio
+        "model_type": "nova",
+        "model_id": "us.amazon.nova-pro-v1:0"
+    }
+]
+multi_region = 'enable'
 
 roleArn = os.environ.get('roleArn') 
 path = os.environ.get('path')
