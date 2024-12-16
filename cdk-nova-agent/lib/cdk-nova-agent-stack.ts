@@ -93,7 +93,7 @@ const titan_embedding_v2 = [  // dimension = 1024
 
 const LLM_for_chat = nova_pro; 
 const LLM_for_multimodal = nova_pro;
-const LLM_embedding = titan_embedding_v2_single;
+const LLM_embedding = titan_embedding_v2;  //  titan_embedding_v2_single
 
 export class CdkNovaAgentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -588,7 +588,7 @@ export class CdkNovaAgentStack extends cdk.Stack {
         callLogTableName: callLogTableName,
         LLM_for_chat: JSON.stringify(LLM_for_chat),
         LLM_for_multimodal:JSON.stringify(LLM_for_multimodal),
-        LLM_embedding: JSON.stringify(titan_embedding_v2),
+        LLM_embedding: JSON.stringify(LLM_embedding),
         opensearch_account: opensearch_account,
         opensearch_passwd: opensearch_passwd,
         opensearch_url: opensearch_url,
@@ -725,7 +725,7 @@ export class CdkNovaAgentStack extends cdk.Stack {
           supportedFormat: supportedFormat,
           LLM_for_chat: JSON.stringify(LLM_for_chat),
           LLM_for_multimodal:JSON.stringify(LLM_for_multimodal),
-          LLM_embedding: JSON.stringify(titan_embedding_v2),
+          LLM_embedding: JSON.stringify(LLM_embedding),
           enableParallelSummary: enableParallelSummary,
           enableParentDocumentRetrival: enableParentDocumentRetrival,
           enableHybridSearch: enableHybridSearch,
