@@ -25,6 +25,15 @@
 
 ## 실행결과
 
+### RAG 구현
+
+Amazon S3에 파일 업로드하면 자동으로 파싱하여 OpenSearch로 구성된 RAG에 chunk된 문서가 저장됩니다. 채팅창에 "LLM Ops에 대해 설명해주세요."라고 입력후에 결과를 확인합니다. 결과를 보면 다른 LLM들에 비하여 약 2배정도 결과를 제공합니다.
+
+
+![noname](https://github.com/user-attachments/assets/b692d664-2d93-402f-a0ca-a9533a1cd91f)
+
+
+
 ### Multi-modal 시험
 
 아래의 Architecture를 다운로드하여 채팅창 하단의 파일 아이콘을 선택하여 업로드 합니다. 
