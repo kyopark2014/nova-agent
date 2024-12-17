@@ -577,7 +577,8 @@ def general_conversation(connectionId, requestId, chat, query):
             "당신은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
             "너의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
             "답변은 markdown 포맷을 사용하지 않고 plane/text 형태로 제공합니다."
-            "Provide all answers in a numbered list format, with each point containing no more than 15 words, and no more than 6 bullet points."
+            "Do not emphasize the title."
+            #"Provide all answers in a numbered list format, with each point containing no more than 15 words, and no more than 6 bullet points."
             #"Provide all answers in a numbered list format, with each point containing no more than 15 words."
         )
     else: 
