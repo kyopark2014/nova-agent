@@ -133,7 +133,9 @@ function connect(endpoint, type) {
 
             if(response.status == 'completed') {          
                 feedback.style.display = 'none';          
-                console.log('received message: ', response.msg);                  
+                console.log('received message: ', response.msg);        
+                
+                response.msg.replace("**", "")
                 addReceivedMessage(response.request_id, response.msg);  
             }                
             else if(response.status == 'istyping') {

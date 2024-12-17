@@ -4081,8 +4081,6 @@ def readStreamMsg(connectionId, requestId, stream):
             #print('event: ', event)
             msg = msg + event
 
-            msg.replace("**", "")
-            
             result = {
                 'request_id': requestId,
                 'msg': msg,
@@ -4407,7 +4405,7 @@ def getResponse(connectionId, jsonBody):
                 ########## Basic ##########
                 if convType == 'normal':      # normal
                     msg = general_conversation(connectionId, requestId, chat, text)
-                    msg.replace("**","")
+                    
                 elif convType == "translation":
                     msg = translate_text(chat, text) 
                 
@@ -4453,7 +4451,7 @@ def getResponse(connectionId, jsonBody):
                                     
                 else:
                     msg = general_conversation(connectionId, requestId, chat, text)  
-                    
+
                 memory_chain.chat_memory.add_user_message(text)
                 memory_chain.chat_memory.add_ai_message(msg)
                 
