@@ -415,7 +415,7 @@ function addSentMessageForSummary(requestId, timestr, text) {
     }
     else {
         index = indexList.get(requestId+':send');
-        console.log("reused index="+index+', id='+requestId+':send');        
+        // console.log("reused index="+index+', id='+requestId+':send');        
     }
     console.log("index:", index);   
 
@@ -442,7 +442,7 @@ function addReceivedMessage(requestId, msg) {
     }
     else {
         index = indexList.get(requestId+':receive');
-        console.log("reused index="+index+', id='+requestId+':receive');        
+        // console.log("reused index="+index+', id='+requestId+':receive');        
     }
     console.log("index:", index);   
 
@@ -647,7 +647,8 @@ function sendRequest(text, requestId, requestTime) {
             response = JSON.parse(xhr.responseText);
             console.log("response: " + JSON.stringify(response));
             
-            addReceivedMessage(response.request_id, response.msg)
+            const message = response.msg.replaceAll("**", "");
+            addReceivedMessage(response.request_id, message)
         }
         else if(xhr.readyState ===4 && xhr.status === 504) {
             console.log("response: " + xhr.readyState + ', xhr.status: '+xhr.status);
@@ -683,7 +684,8 @@ function sendRequestForSummary(object, requestId, requestTime) {
             response = JSON.parse(xhr.responseText);
             console.log("response: " + JSON.stringify(response));
             
-            addReceivedMessage(response.request_id, response.msg)
+            const message = response.msg.replaceAll("**", "");
+            addReceivedMessage(response.request_id, message)
         }
         else if(xhr.readyState ===4 && xhr.status === 504) {
             console.log("response: " + xhr.readyState + ', xhr.status: '+xhr.status);
@@ -739,7 +741,9 @@ function sendRequestForRetry(requestId) {
                         
             if(response.msg) {
                 isResponsed.put(response.request_id, true);
-                addReceivedMessage(response.request_id, response.msg);        
+
+                const message = response.msg.replaceAll("**", "");
+                addReceivedMessage(response.request_id, message);        
                 
                 console.log('completed!');
             }            
@@ -784,7 +788,9 @@ function getHistory(userId, allowTime) {
                     let msg = history[i].msg;
                     console.log("answer: ", msg);
                     addSentMessage(requestId, timestr, body)
-                    addReceivedMessage(requestId, msg);                            
+
+                    const message = msg.replaceAll("**", "");
+                    addReceivedMessage(requestId, message);                            
                 }                 
             }         
             if(history.length>=1) {
