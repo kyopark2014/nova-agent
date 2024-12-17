@@ -135,7 +135,7 @@ function connect(endpoint, type) {
                 feedback.style.display = 'none';          
                 console.log('received message: ', response.msg);        
                                 
-                const message = response.msg.replace(/**/g,"")
+                const message = response.msg.replaceAll("**", "");
                 addReceivedMessage(response.request_id, message);  
             }                
             else if(response.status == 'istyping') {
@@ -146,7 +146,7 @@ function connect(endpoint, type) {
             else if(response.status == 'proceeding') {
                 feedback.style.display = 'none';
                 
-                const message = response.msg.replace(/**/g,"")
+                const message = response.msg.replaceAll("**", "");
                 addReceivedMessage(response.request_id, message);  
             }                
             else if(response.status == 'debug') {
