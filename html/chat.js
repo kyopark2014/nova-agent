@@ -135,8 +135,9 @@ function connect(endpoint, type) {
                 feedback.style.display = 'none';          
                 console.log('received message: ', response.msg);        
                 
-                response.msg.replace(/**/g,"")
-                addReceivedMessage(response.request_id, response.msg);  
+                const message = response.msg
+                message.replace(/**/g,"")
+                addReceivedMessage(response.request_id, message);  
             }                
             else if(response.status == 'istyping') {
                 feedback.style.display = 'inline';
@@ -145,7 +146,10 @@ function connect(endpoint, type) {
             }
             else if(response.status == 'proceeding') {
                 feedback.style.display = 'none';
-                addReceivedMessage(response.request_id, response.msg);  
+                
+                const message = response.msg
+                message.replace(/**/g,"")
+                addReceivedMessage(response.request_id, message);  
             }                
             else if(response.status == 'debug') {
                 feedback.style.display = 'none';
