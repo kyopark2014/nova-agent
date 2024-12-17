@@ -135,7 +135,7 @@ function connect(endpoint, type) {
                 feedback.style.display = 'none';          
                 console.log('received message: ', response.msg);        
                 
-                response.msg.replace("**", "")
+                response.msg.replace(/**/g,"")
                 addReceivedMessage(response.request_id, response.msg);  
             }                
             else if(response.status == 'istyping') {
@@ -358,7 +358,7 @@ function addSentMessage(requestId, timestr, text) {
     }
     else {
         index = indexList.get(requestId+':send');
-        console.log("reused index="+index+', id='+requestId+':send');        
+        // console.log("reused index="+index+', id='+requestId+':send');        
     }
     console.log("index:", index);   
 
