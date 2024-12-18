@@ -1885,7 +1885,7 @@ def run_agent_executor2(connectionId, requestId, query):
             print(f"tool_calls: ", last_message.tool_calls)
 
             for message in last_message.tool_calls:
-                print(f'tool name: {message['name']}, args: {message['args']}')
+                print(f"tool name: {message['name']}, args: {message['args']}")
                 update_state_message(f"calling... {message['name']}", config)
 
             print(f"--- CONTINUE: {last_message.tool_calls[-1]['name']} ---")
