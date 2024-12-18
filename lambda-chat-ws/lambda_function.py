@@ -1849,7 +1849,7 @@ def run_agent_executor2(connectionId, requestId, query):
             answer = state['answer']
         else:
             answer = ""
-            
+
         for re in response.content:
             if "type" in re:
                 if re['type'] == 'text':
@@ -1863,10 +1863,6 @@ def run_agent_executor2(connectionId, requestId, query):
                 print(response.content)
                 break
 
-        # if isinstance(response, ToolMessage):
-        #     print('tool message: ', response)
-        #     pass
-        # else:
         response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)     
         print('message: ', response)
         
@@ -1954,10 +1950,10 @@ def run_agent_executor2(connectionId, requestId, query):
     for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
         # print('event: ', event)
         
-        message = event["messages"][-1]
+        message = event["answer"]
         # print('message: ', message)
 
-    msg = readStreamMsg(connectionId, requestId, message.content)
+    msg = readStreamMsg(connectionId, requestId, message)
 
     #return msg[msg.find('<result>')+8:len(msg)-9]
     return msg
