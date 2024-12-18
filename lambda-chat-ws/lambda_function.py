@@ -1845,7 +1845,11 @@ def run_agent_executor2(connectionId, requestId, query):
         response = agent.invoke(state["messages"])
         print('response: ', response)
 
-        answer = state['answer']
+        if "answer" in state:
+            answer = state['answer']
+        else:
+            answer = ""
+            
         for re in response.content:
             if "type" in re:
                 if re['type'] == 'text':
