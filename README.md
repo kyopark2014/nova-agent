@@ -13,18 +13,24 @@
 
 "서울과 제주의 주거비를 비교해주세요."에 대한 결과를 Claude 3.0과 Nova Pro가 비교 합니다.
 
-### Nova와 Claude 결과 비교
+### Claude Nova의 동작 비교
+
+Claude를 실행하면 아래와 같은 결과를 얻을 수 있습니다.
+
+![image](https://github.com/user-attachments/assets/8fd93d20-1c9c-4567-8430-1ce20d2139e8)
+
+이때의 Claude Sonnet 결과는 아래와 같습니다. 전체 21.5초가 소요되었고, action - thinking - action의 형태로 동작하였습니다. 
+
+![noname](https://github.com/user-attachments/assets/d61d1de6-1b1d-4a79-8944-a29d803c7c16)
 
 
+Amazon Nova의 결과는 아래와 같습니다. 여기서 온도 정보가 부정확한것은 weather api가 한국 정보를 충분히 제공하지 못하기 때문입니다. 요약한 결과는 유사합니다.
 
-![image](https://github.com/user-attachments/assets/f0985c2c-84ec-4332-a262-5c7c5e860055)
+![noname](https://github.com/user-attachments/assets/c68c7f30-5b11-4f43-bfdb-ed76258a9563)
 
-이때의 Claude 결과는 아래와 같습니다. 전체
-![image](https://github.com/user-attachments/assets/ab22a06d-a9a7-41a9-bff1-fb5a300c8776)
+이때의 동작방식을 확인하면 아래와 같습니다. 전체 수행시간은 8.7초가 소요되었고, action 한번에 weather api를 2회 연속 호출하였습니다. Amazon Nova Pro는 Claude Sonnet 대비 기본 추론이 2배 빠를 뿐 아니라 API를 호출할 때에 action - thinking을 반복하지 않고 action 한번에 모든 동작을 수행합니다.
 
-이때의 LangSmit
-
-![image](https://github.com/user-attachments/assets/4630707b-cdc8-406d-805d-e5c4478bee2c)
+![noname](https://github.com/user-attachments/assets/12279b91-dd9c-447b-abe1-c0adcb6a960b)
 
 
 ## 직접 실습 해보기
