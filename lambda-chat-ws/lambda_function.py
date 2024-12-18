@@ -1848,20 +1848,10 @@ def run_agent_executor2(connectionId, requestId, query):
         # We convert the agent output into a format that is suitable to append to the global state
         if isinstance(response, ToolMessage):
             print('tool message: ', response)
-
-            toolinfo = response.tool_calls[-1]
-            print('toolinfo: ', toolinfo)
-            if toolinfo['type'] == 'tool_call':
-                print('tool name: ', toolinfo['name'])                    
-                update_state_message(f"calling... {toolinfo['name']}", config)
-
             pass
-        elif response.content[-1]["type"] == 'tool_use':
-            print('tool_use: ', response.content[-1])
-            update_state_message(f"calling... {response.content[-1]['name']}", config)
         else:
             response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)     
-            print('AIMessage: ', response)
+            print('ai message: ', response)
             
         return {
             "messages": [response],
@@ -1874,7 +1864,7 @@ def run_agent_executor2(connectionId, requestId, query):
     
     execution_agent_node = functools.partial(agent_node, agent=execution_agent, name="execution_agent")
     
-    def should_continue(state: State) -> Literal["continue", "end"]:
+    def should_continue(state: State, config) -> Literal["continue", "end"]:
         print("###### should_continue ######")
         messages = state["messages"]    
         # print('(should_continue) messages: ', messages)
@@ -1885,7 +1875,12 @@ def run_agent_executor2(connectionId, requestId, query):
             print("--- END ---")
             return "end"
         else:      
-            print(f"tool_calls: ", last_message.tool_calls)            
+            print(f"tool_calls: ", last_message.tool_calls)
+
+            for message in last_message.tool_calls:
+                print('tool name: ', message['name'])
+                update_state_message(f"calling... {message['name']}", config)
+
             print(f"--- CONTINUE: {last_message.tool_calls[-1]['name']} ---")
             return "continue"
 
