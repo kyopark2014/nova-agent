@@ -11,7 +11,29 @@
 ## Agent
 
 
-"서울과 제주의 주거비를 비교해주세요."에 대한 결과를 Claude 3.0과 Nova Pro가 비교 합니다.
+API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 Reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 Reasoning로 매번 1개의 action을 줌으로써 Reasoning - Action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
+
+```java
+[
+   {
+      "type":"tool_use",
+      "name":"get_weather_info",
+      "input":{
+         "city":"서울"
+      },
+      "id":"tooluse_Kg9LCHHrR1mWz7VKHp0pmg"
+   },
+   {
+      "type":"tool_use",
+      "name":"get_weather_info",
+      "input":{
+         "city":"부산"
+      },
+      "id":"tooluse_B1sjTzWOQ8Kgcjuxhw28Sw"
+   }
+]
+```
+
 
 ### Claude Nova의 동작 비교
 
