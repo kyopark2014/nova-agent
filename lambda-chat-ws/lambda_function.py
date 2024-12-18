@@ -1856,8 +1856,12 @@ def run_agent_executor2(connectionId, requestId, query):
                 update_state_message(f"calling... {toolinfo['name']}", config)
 
             pass
+        elif response.content[-1]["type"] == 'tool_use':
+            print('tool_use: ', response.content[-1])
+            update_state_message(f"calling... {response.content[-1]['name']}", config)
         else:
-            response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)            
+            response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)     
+            print('AIMessage: ', response)
             
         return {
             "messages": [response],
