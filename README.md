@@ -34,6 +34,20 @@ API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교�
 ]
 ```
 
+Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
+
+```java
+[
+   {
+      "name":"get_weather_info",
+      "args":{
+         "city":"서울"
+      },
+      "id":"toolu_bdrk_01NWq2euSMtLwrE9HPDq7WzW",
+      "type":"tool_call"
+   }
+]
+```
 
 ### Claude Nova의 동작 비교
 
