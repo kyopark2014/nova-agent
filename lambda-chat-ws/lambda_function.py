@@ -1950,7 +1950,10 @@ def run_agent_executor2(connectionId, requestId, query):
     for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
         # print('event: ', event)
         
-        message = event["answer"]
+        if "answer" in event:
+            message = event["answer"]
+        else:
+            message = event["messages"][-1].content
         # print('message: ', message)
 
     msg = readStreamMsg(connectionId, requestId, message)
