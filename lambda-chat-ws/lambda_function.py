@@ -1846,10 +1846,13 @@ def run_agent_executor2(connectionId, requestId, query):
         print('response: ', response)
 
         for re in response.content:
-            if re['type'] == 'text':
-                print(f"type: {re['type']}, text: {re['text']}")
-            elif re['type'] == 'tool_call':                
-                print(f"type: {re['type']}, name: {re['name']}, input: {re['input']}")
+            if "type" in re:
+                if re['type'] == 'text':
+                    print(f"{re['type']}: {re['text']}")
+                elif re['type'] == 'tool_call':                
+                    print(f"{re['type']}: name: {re['name']}, input: {re['input']}")
+                else:
+                    print(re)
             else:
                 print(re)
 
