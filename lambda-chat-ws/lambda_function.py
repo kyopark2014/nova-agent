@@ -1844,15 +1844,22 @@ def run_agent_executor2(connectionId, requestId, query):
         
         response = agent.invoke(state["messages"])
         print('response: ', response)
-                
-        # We convert the agent output into a format that is suitable to append to the global state
-        if isinstance(response, ToolMessage):
-            print('tool message: ', response)
-            pass
-        else:
-            response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)     
-            print('ai message: ', response)
-            
+
+        for re in response.content:
+            if re['type'] == 'text':
+                print(f'type: {re['type']}, text: {re['text']}')
+            elif re['type'] == 'tool_call':                
+                print(f'type: {re['type']}, name: {re['name']}, input: {re['input']}')
+            else:
+                print(re)
+
+        # if isinstance(response, ToolMessage):
+        #     print('tool message: ', response)
+        #     pass
+        # else:
+        response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)     
+        print('message: ', response)
+        
         return {
             "messages": [response],
             "sender": name,
@@ -1878,7 +1885,7 @@ def run_agent_executor2(connectionId, requestId, query):
             print(f"tool_calls: ", last_message.tool_calls)
 
             for message in last_message.tool_calls:
-                print('tool name: ', message['name'])
+                print(f'tool name: {message['name']}, args: {message['args']}')
                 update_state_message(f"calling... {message['name']}", config)
 
             print(f"--- CONTINUE: {last_message.tool_calls[-1]['name']} ---")
