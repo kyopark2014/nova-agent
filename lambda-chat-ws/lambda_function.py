@@ -1057,6 +1057,9 @@ def search_by_opensearch(keyword: str) -> str:
         content = doc.page_content
         
         relevant_docs = relevant_docs + f"{content}\n\n"
+
+    if len(relevant_docs) == 0:
+        relevant_docs = "No relevant documents found."
         
     return relevant_docs
 
@@ -1839,7 +1842,7 @@ def run_agent_executor2(connectionId, requestId, query):
         return prompt | chat.bind_tools(tools)
     
     def agent_node(state, agent, name):
-        print(f"###### agent_node:{name} ######")        
+        print(f"###### agent_node:{name} ######")
         print('state: ', state["messages"])
         
         response = agent.invoke(state["messages"])
@@ -4606,7 +4609,7 @@ def getResponse(connectionId, jsonBody):
         elapsed_time = int(time.time()) - start
         print("total run time(sec): ", elapsed_time)
         
-        print('msg: ', msg)
+        # print('msg: ', msg)
 
         item = {
             'user_id': {'S':userId},
