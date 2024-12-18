@@ -1879,10 +1879,7 @@ def run_agent_executor2(connectionId, requestId, query):
         
         if "answer" in state:
             answer = state['answer']
-            print('middle answer: ', answer)
-
-            answer += '\n'+state["messages"][-1].content
-            print('final answer: ', answer)
+            print('answer: ', answer)
         else:
             answer = state["messages"][-1].content
             print('answer: ', answer)
