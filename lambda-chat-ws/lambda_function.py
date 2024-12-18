@@ -1815,7 +1815,7 @@ def run_agent_executor2(connectionId, requestId, query):
             "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
             "모르는 질문을 받으면 솔직히 모른다고 말합니다."
             "최종 답변에는 조사한 내용을 반드시 포함합니다."
-            #"최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요."         
+            #"최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요."
             "You are a helpful AI assistant, collaborating with other assistants."
             "Use the provided tools to progress towards answering the question."
             "If you are unable to fully answer, that's OK, another assistant with different tools "
@@ -1847,6 +1847,14 @@ def run_agent_executor2(connectionId, requestId, query):
                 
         # We convert the agent output into a format that is suitable to append to the global state
         if isinstance(response, ToolMessage):
+            print('tool message: ', response)
+
+            toolinfo = response.tool_calls[-1]
+            print('toolinfo: ', toolinfo)
+            if toolinfo['type'] == 'tool_call':
+                print('tool name: ', toolinfo['name'])                    
+                update_state_message(f"calling... {toolinfo['name']}", config)
+
             pass
         else:
             response = AIMessage(**response.dict(exclude={"type", "name"}), name=name)            
@@ -1857,7 +1865,6 @@ def run_agent_executor2(connectionId, requestId, query):
         }
     
     chat = get_chat()
-    #system_message = "You should provide accurate data for the chart_generator to use."
     system_message = "You should provide accurate data for the questione."
     execution_agent = create_agent(chat, tools, system_message)
     
@@ -1898,7 +1905,7 @@ def run_agent_executor2(connectionId, requestId, query):
 
     app = buildAgentExecutor()
         
-    isTyping(connectionId, requestId, "")
+    isTyping(connectionId, requestId, "thinking...")
     
     inputs = [HumanMessage(content=query)]
     config = {
