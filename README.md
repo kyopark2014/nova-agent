@@ -11,6 +11,22 @@
 ## Agent
 
 
+"서울과 제주의 주거비를 비교해주세요."에 대한 결과를 Claude 3.0과 Nova Pro가 비교 합니다.
+
+### Nova와 Claude 결과 비교
+
+
+
+![image](https://github.com/user-attachments/assets/f0985c2c-84ec-4332-a262-5c7c5e860055)
+
+이때의 Claude 결과는 아래와 같습니다. 전체
+![image](https://github.com/user-attachments/assets/ab22a06d-a9a7-41a9-bff1-fb5a300c8776)
+
+이때의 LangSmit
+
+![image](https://github.com/user-attachments/assets/4630707b-cdc8-406d-805d-e5c4478bee2c)
+
+
 ## 직접 실습 해보기
 
 ### 사전 준비 사항
