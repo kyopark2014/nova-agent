@@ -1802,7 +1802,7 @@ class GradeDocuments(BaseModel):
 def run_agent_executor2(connectionId, requestId, query):        
     class State(TypedDict):
         messages: Annotated[list, add_messages]
-        sender: str
+        answer: str
 
     tool_node = ToolNode(tools)
             
@@ -1845,16 +1845,19 @@ def run_agent_executor2(connectionId, requestId, query):
         response = agent.invoke(state["messages"])
         print('response: ', response)
 
+        answer = state['answer']
         for re in response.content:
             if "type" in re:
                 if re['type'] == 'text':
-                    print(f"{re['type']}: {re['text']}")
-                elif re['type'] == 'tool_call':                
-                    print(f"{re['type']}: name: {re['name']}, input: {re['input']}")
+                    print(f"--> {re['type']}: {re['text']}")
+                elif re['type'] == 'tool_use':                
+                    print(f"--> {re['type']}: name: {re['name']}, input: {re['input']}")
                 else:
                     print(re)
-            else:
-                print(re)
+            else: # answer
+                answer += '\n'+response.content
+                print(response.content)
+                break
 
         # if isinstance(response, ToolMessage):
         #     print('tool message: ', response)
@@ -1865,7 +1868,24 @@ def run_agent_executor2(connectionId, requestId, query):
         
         return {
             "messages": [response],
-            "sender": name,
+            "answer": answer
+        }
+    
+    def final_answer(state):
+        print(f"###### final_answer ######")        
+        
+        if "answer" in state:
+            answer = state['answer']
+            print('middle answer: ', answer)
+
+            answer += '\n'+state["messages"][-1].content
+            print('final answer: ', answer)
+        else:
+            answer = state["messages"][-1].content
+            print('answer: ', answer)
+        
+        return {
+            "answer": answer
         }
     
     chat = get_chat()
@@ -1899,16 +1919,19 @@ def run_agent_executor2(connectionId, requestId, query):
 
         workflow.add_node("agent", execution_agent_node)
         workflow.add_node("action", tool_node)
+        workflow.add_node("final_answer", final_answer)
+        
         workflow.add_edge(START, "agent")
         workflow.add_conditional_edges(
             "agent",
             should_continue,
             {
                 "continue": "action",
-                "end": END,
+                "end": "final_answer",
             },
         )
         workflow.add_edge("action", "agent")
+        workflow.add_edge("final_answer", END)
 
         return workflow.compile()
 
