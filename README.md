@@ -33,21 +33,17 @@ stream = chain.invoke(
        "input": query,
    }
 )
-msg = readStreamMsg(connectionId, requestId, stream.content)    
 
-def readStreamMsg(connectionId, requestId, stream):
-    msg = ""
-    if stream:
-        for event in stream:
-            msg = msg + event
+msg = ""
+for event in stream:
+    msg = msg + event
 
-            result = {
-                'request_id': requestId,
-                'msg': msg,
-                'status': 'proceeding'
-            }
-            sendMessage(connectionId, result)
-    return msg
+    result = {
+        'request_id': requestId,
+        'msg': msg,
+        'status': 'proceeding'
+    }
+    sendMessage(connectionId, result)
 ```
 
 ## RAG
