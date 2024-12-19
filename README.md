@@ -4,7 +4,51 @@
 
 ## Basic Chat
 
-[Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)의 대표적인 예는 아래와 같습니다. 
+[Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. LangChain을 이용하므로 사용하는 model에 맞게 model_id와 parameter를 지정하면 Nova Pro의 설정은 다른 LLM과 동일합니다.
+
+```python
+chat = ChatBedrock(  
+  model_id="us.amazon.nova-pro-v1:0",
+  client=boto3_bedrock, 
+  model_kwargs=parameters,
+) 
+
+system = (
+   "당신은 사려깊은 인공지능 도우미입니다." 
+   "당신은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
+   "너의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
+   "답변은 markdown 포맷을 사용하지 않고 text 형태로 제공합니다."
+)    
+human = "{input}"
+
+prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
+history = memory_chain.load_memory_variables({})["chat_history"]
+          
+chain = prompt | chat    
+
+isTyping(connectionId, requestId, "")  
+stream = chain.invoke(
+   {
+       "history": history,
+       "input": query,
+   }
+)
+msg = readStreamMsg(connectionId, requestId, stream.content)    
+
+def readStreamMsg(connectionId, requestId, stream):
+    msg = ""
+    if stream:
+        for event in stream:
+            msg = msg + event
+
+            result = {
+                'request_id': requestId,
+                'msg': msg,
+                'status': 'proceeding'
+            }
+            sendMessage(connectionId, result)
+    return msg
+```
 
 ## RAG
 
