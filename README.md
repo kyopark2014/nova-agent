@@ -4,6 +4,8 @@
 
 ## Basic Chat
 
+[Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)의 대표적인 예는 아래와 같습니다. 
+
 ## RAG
 
 ## Multi-modal
