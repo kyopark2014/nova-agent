@@ -51,7 +51,7 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
-Claude Sonnet을 실행하면 아래와 같은 결과를 얻을 수 있습니다.
+"서울과 부산의 현재 날씨를 비교해주세요."와 같이 2번의 weather 호출이 필요한 경우에, Claude Sonnet의 실행 결과는 아래와 같습니다.
 
 ![image](https://github.com/user-attachments/assets/f7757304-fba2-4374-9996-3b9bfd6ffe26)
 
@@ -60,7 +60,7 @@ Claude Sonnet을 실행하면 아래와 같은 결과를 얻을 수 있습니다
 ![noname](https://github.com/user-attachments/assets/d61d1de6-1b1d-4a79-8944-a29d803c7c16)
 
 
-Amazon Nova의 결과는 아래와 같습니다. 여기서 온도 정보가 부정확한것은 [weather api](https://openweathermap.org/)가 한국 정보를 충분히 제공하지 못하기 때문입니다. 요약한 결과는 유사합니다.
+동일한 질문에 대한 Nova Pro의 결과는 아래와 같습니다. 여기서 온도 정보가 부정확한것은 [weather api](https://openweathermap.org/)가 한국 정보를 충분히 제공하지 못하기 때문입니다. Claude Sonnet과 Nova Pro의 결과는 유사합니다.
 
 ![image](https://github.com/user-attachments/assets/3d87d754-3ebc-44a5-8a5e-d74c0dd1c9fb)
 
