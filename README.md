@@ -49,22 +49,22 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 ]
 ```
 
-### Claude Nova의 동작 비교
+### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
-Claude를 실행하면 아래와 같은 결과를 얻을 수 있습니다.
+Claude Sonnet을 실행하면 아래와 같은 결과를 얻을 수 있습니다.
 
 ![image](https://github.com/user-attachments/assets/f7757304-fba2-4374-9996-3b9bfd6ffe26)
 
-이때의 Claude Sonnet 결과는 아래와 같습니다. 전체 21.5초가 소요되었고, action - thinking - action의 형태로 동작하였습니다. 
+이때의 Claude Sonnet 결과는 아래와 같습니다. 전체 21.5초가 소요되었고, reasoning - action - reasoning - action의 형태로 동작하였습니다. 
 
 ![noname](https://github.com/user-attachments/assets/d61d1de6-1b1d-4a79-8944-a29d803c7c16)
 
 
-Amazon Nova의 결과는 아래와 같습니다. 여기서 온도 정보가 부정확한것은 weather api가 한국 정보를 충분히 제공하지 못하기 때문입니다. 요약한 결과는 유사합니다.
+Amazon Nova의 결과는 아래와 같습니다. 여기서 온도 정보가 부정확한것은 [weather api](https://openweathermap.org/)가 한국 정보를 충분히 제공하지 못하기 때문입니다. 요약한 결과는 유사합니다.
 
 ![image](https://github.com/user-attachments/assets/3d87d754-3ebc-44a5-8a5e-d74c0dd1c9fb)
 
-이때의 동작방식을 확인하면 아래와 같습니다. 전체 수행시간은 8.7초가 소요되었고, action 한번에 weather api를 2회 연속 호출하였습니다. Amazon Nova Pro는 Claude Sonnet 대비 기본 추론이 2배 빠를 뿐 아니라 API를 호출할 때에 action - thinking을 반복하지 않고 action 한번에 모든 동작을 수행합니다.
+이때의 동작방식을 확인하면 아래와 같습니다. 전체 수행시간은 8.7초가 소요되었고, reasoning - action - action 형태로 weather api를 2회 연속 호출하였습니다. Amazon Nova Pro의 추론 속도는 Claude Sonnet 대비 2배 빠를 뿐 아니라, Agent에서 API를 호출할 때에 연속적으로 action을 수행함으로써 Claude Sonnet 대비 속도를 더 개선 할 수 있습니다.
 
 ![noname](https://github.com/user-attachments/assets/12279b91-dd9c-447b-abe1-c0adcb6a960b)
 
