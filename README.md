@@ -4,7 +4,7 @@
 
 ## Basic Chat
 
-[Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. LangChain을 이용하므로 사용하는 model에 맞게 model_id와 parameter를 지정하면 Nova Pro의 설정은 다른 LLM과 동일합니다.
+[Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. Nova Pro에 맞게 model_id와 parameter를 지정합니다. 
 
 ```python
 chat = ChatBedrock(  
