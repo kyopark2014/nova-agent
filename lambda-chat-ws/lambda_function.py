@@ -577,8 +577,6 @@ def general_conversation(connectionId, requestId, chat, query):
             "당신은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
             "너의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."
             "답변은 markdown 포맷을 사용하지 않고 text 형태로 제공합니다."
-            #"Provide all answers in a numbered list format, with each point containing no more than 15 words, and no more than 6 bullet points."
-            #"Provide all answers in a numbered list format, with each point containing no more than 15 words."
         )
     else: 
         system = (
@@ -588,7 +586,7 @@ def general_conversation(connectionId, requestId, chat, query):
             "You will only answer in text format, using markdown format is not allowed."        
         )
     
-    human = "{input}"
+    human = "{{input}}"
     
     prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
     # print('prompt: ', prompt)
@@ -664,15 +662,13 @@ def get_answer_using_opensearch(chat, text, connectionId, requestId):
                 )
             )
     else: 
-        print("###### similarity_search_with_score ######")
         relevant_documents = vectorstore_opensearch.similarity_search_with_score(
             query = text,
             k = top_k
         )
         
         for i, document in enumerate(relevant_documents):
-            print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
+            print(f'## Document(opensearch-vector) {i+1}: {document}')            
             name = document[0].metadata['name']
             url = document[0].metadata['url']
             content = document[0].page_content
@@ -3833,22 +3829,23 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
                 
     if isKorean(revised_question)==True:
         system = (
-            """다음의 <context> tag안의 참고자료를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
-            
-            <context>
-            {context}
-            </context>"""
+            "당신은 사려깊은 인공지능 도우미입니다." 
+            "다음의 Reference texts를 이용하여 질문에 대한 정확한 답변을 제공합니다."
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
         )
     else: 
         system = (
-            """Here is pieces of context, contained in <context> tags. Provide a concise answer to the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
-            
-            <context>
-            {context}
-            </context>"""
-        )
-    
-    human = "{input}"
+            "You will be acting as a thoughtful advisor."
+            "Provide a concise answer to the question at the end using reference texts." 
+            "If you don't know the answer, just say that you don't know, don't try to make up an answer."
+            # "Do not use information that is not in the reference texts."
+        )    
+    human = (
+        "Question: {{input}}"
+
+        "Reference texts: "
+        "{{context}}"
+    )
     
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
     # print('prompt: ', prompt)
