@@ -11,7 +11,7 @@
 ## Agent
 
 
-API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 Reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 Reasoning로 매번 1개의 action을 줌으로써 Reasoning - Action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
+API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 reasoning로 매번 1개의 action을 줌으로써 reasoning - action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
 
 ```java
 [
