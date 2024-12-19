@@ -55,7 +55,7 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 
 ![image](https://github.com/user-attachments/assets/f7757304-fba2-4374-9996-3b9bfd6ffe26)
 
-이때의 Claude Sonnet 결과는 아래와 같습니다. 전체 21.5초가 소요되었고, reasoning - action - reasoning - action의 형태로 동작하였습니다. 
+이때의 Claude Sonnet으로 만든 Agent의 동작은 아래와 같습니다. 전체 동작에 21.5초가 소요되었고, reasoning - action - reasoning - action의 형태로 동작하였습니다. 
 
 ![noname](https://github.com/user-attachments/assets/d61d1de6-1b1d-4a79-8944-a29d803c7c16)
 
