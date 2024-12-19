@@ -64,7 +64,7 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 
 ![image](https://github.com/user-attachments/assets/3d87d754-3ebc-44a5-8a5e-d74c0dd1c9fb)
 
-이때의 동작방식을 확인하면 아래와 같습니다. 전체 수행시간은 8.7초가 소요되었고, reasoning - action - action 형태로 weather api를 2회 연속 호출하였습니다. Amazon Nova Pro의 추론 속도는 Claude Sonnet 대비 2배 빠를 뿐 아니라, Agent에서 API를 호출할 때에 연속적으로 action을 수행함으로써 Claude Sonnet 대비 속도를 더 개선 할 수 있습니다.
+이때의 동작방식을 확인하면 아래와 같습니다. 전체 수행시간은 8.7초가 소요되었고, reasoning - action - action 형태로 weather api를 2회 연속 호출하였습니다. Nova Pro의 추론 속도는 Claude Sonnet 대비 2배 빠를 뿐 아니라, agent에서 API를 호출할 때에 연속적으로 action을 수행할 수 있어서, Claude Sonnet 만든 agent 대비 구조적으로 더 속도를 개선할 수 있습니다.
 
 ![noname](https://github.com/user-attachments/assets/12279b91-dd9c-447b-abe1-c0adcb6a960b)
 
