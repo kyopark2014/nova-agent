@@ -586,7 +586,7 @@ def general_conversation(connectionId, requestId, chat, query):
             "You will only answer in text format, using markdown format is not allowed."        
         )
     
-    human = "{{input}}"
+    human = "{input}"
     
     prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
     # print('prompt: ', prompt)
@@ -3841,10 +3841,10 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
             # "Do not use information that is not in the reference texts."
         )    
     human = (
-        "Question: {{input}}"
+        "Question: {input}"
 
         "Reference texts: "
-        "{{context}}"
+        "{context}"
     )
     
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
