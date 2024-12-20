@@ -1132,9 +1132,11 @@ def lexical_search(query, top_k):
     return docs
 
 def get_retrieval_grader(chat):
-    system = """You are a grader assessing relevance of a retrieved document to a user question. \n 
-    If the document contains keyword(s) or semantic meaning related to the question, grade it as relevant. \n
-    Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."""
+    system = (
+        "You are a grader assessing relevance of a retrieved document to a user question."
+        "If the document contains keyword(s) or semantic meaning related to the question, grade it as relevant."
+        "Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."
+    )
 
     grade_prompt = ChatPromptTemplate.from_messages(
         [
@@ -1556,20 +1558,22 @@ def web_search(question, documents):
 def get_reg_chain(langMode):
     if langMode:
         system = (
-        """다음의 <context> tag안의 참고자료를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다. Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다.
-
-        <context>
-        {context}
-        </context>""")
+            "Reference Text를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
+            "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."    
+        )
     else: 
         system = (
-        """Here is pieces of context, contained in <context> tags. Provide a concise answer to the question at the end. If you don't know the answer, just say that you don't know, don't try to make up an answer.
+            "Here is pieces of context, contained in <context> tags."
+            "Provide a concise answer to the question at the end."
+            "If you don't know the answer, just say that you don't know, don't try to make up an answer."
+        )
         
-        <context>
-        {context}
-        </context>""")
+    human = (
+        "Question: {question}"
         
-    human = "{question}"
+        "Reference Text:"
+        "{context}"
+    )
         
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
                     
@@ -1630,32 +1634,6 @@ def get_answer_grader():
     )
     answer_grader = answer_prompt | structured_llm_grade_answer
     return answer_grader
-
-@tool
-def grade_answer_for_tool(question: str, answer: str):
-    """
-    Grade whether the answer is useful or not
-    keyword: question and generated answer which could be useful
-    return: binary score represented by "yes" or "no"
-    """    
-    print("###### grade_answer ######")
-    print('question: ', question)
-    print('answer: ', answer)
-                
-    answer_grader = get_answer_grader()    
-    score = answer_grader.invoke({"question": question, "generation": answer})
-    answer_grade = score.binary_score        
-    print("answer_grade: ", answer_grade)
-
-    if answer_grade == "yes":
-        print("---DECISION: GENERATION ADDRESSES QUESTION---")
-        result_str = f"This answer was varified: {answer}"
-        return (
-            result_str + "\n\nIf you have completed all tasks, respond with FINAL ANSWER."
-        )
-    else:
-        print("---DECISION: GENERATION DOES NOT ADDRESS QUESTION---")
-        return f"This answer is invalid. Try again from retrieval_node"
     
 def get_hallucination_grader():    
     class GradeHallucinations(BaseModel):
