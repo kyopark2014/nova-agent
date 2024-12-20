@@ -3998,7 +3998,7 @@ def revise_question(connectionId, requestId, chat, query):
         generated_question = result.content
         print('generated_question: ', generated_question)
                 
-        revised_question = generated_question[generated_question.find('<result>')+8:generated_question.find('</result>')-1] 
+        revised_question = generated_question[generated_question.find('<result>')+8:generated_question.find('</result>')] 
         # print('revised_question: ', revised_question)
         
     except Exception:
