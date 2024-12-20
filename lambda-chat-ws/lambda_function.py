@@ -2505,10 +2505,13 @@ def run_self_corrective_rag(connectionId, requestId, query):
     
     return value["messages"][-1].content
 
+
+
+
 ####################### LangGraph #######################
 # Plan and Execute
 #########################################################
-def run_plan_and_exeucute(connectionId, requestId, query):
+def run_planning(connectionId, requestId, query):
     class State(TypedDict):
         input: str
         plan: list[str]
@@ -2516,62 +2519,52 @@ def run_plan_and_exeucute(connectionId, requestId, query):
         info: Annotated[List[Tuple], operator.add]
         answer: str
 
-    class Plan(BaseModel):
-        """List of steps as a json format"""
-
-        steps: List[str] = Field(
-            description="different steps to follow, should be in sorted order"
-        )
-
-    def get_planner():
-        system = (
-            "For the given objective, come up with a simple step by step plan."
-            "This plan should involve individual tasks, that if executed correctly will yield the correct answer. Do not add any superfluous steps."
-            "The result of the final step should be the final answer. Make sure that each step has all the information needed - do not skip steps."
-        )
-            
-        planner_prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system),
-                ("placeholder", "{messages}"),
-            ]
-        )
-        
-        chat = get_chat()   
-        
-        planner = planner_prompt | chat
-        return planner
-    
     def plan_node(state: State, config):
         print("###### plan ######")
         print('input: ', state["input"])
         
         update_state_message("planning...", config)
-        
-        inputs = [HumanMessage(content=state["input"])]
-
-        planner = get_planner()
-        response = planner.invoke({"messages": inputs})
-        print('response.content: ', response.content)
-        
-        for attempt in range(5):
-            chat = get_chat()
-            structured_llm = chat.with_structured_output(Plan, include_raw=True)
-            info = structured_llm.invoke(response.content)
-            print(f'attempt: {attempt}, info: {info}')
+                
+        system = (
+            "당신은 user의 question을 해결하기 위해 step by step plan을 생성하는 AI agent입니다."                
             
-            if not info['parsed'] == None:
-                parsed_info = info['parsed']
-                # print('parsed_info: ', parsed_info)        
-                print('steps: ', parsed_info.steps)                
-                return {
-                    "input": state["input"],
-                    "plan": parsed_info.steps
-                }
+            "문제를 충분히 이해하고, 문제 해결을 위한 계획을 다음 형식으로 4단계 이하의 계획을 세웁니다."                
+            "각 단계는 반드시 한줄의 문장으로 AI agent가 수행할 내용을 명확히 나타냅니다."
+            "1. [질문을 해결하기 위한 단계]"
+            "2. [질문을 해결하기 위한 단계]"
+            "..."                
+        )
         
-        print('parsing_error: ', info['parsing_error'])
-        return {"plan": []}          
-
+        human = (
+            "{question}"
+        )
+                            
+        planner_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system),
+                ("human", human),
+            ]
+        )
+        chat = get_chat()
+        planner = planner_prompt | chat
+        response = planner.invoke({
+            "question": state["input"]
+        })
+        print('response.content: ', response.content)
+        result = response.content
+        
+        #output = result[result.find('<result>')+8:result.find('</result>')]
+        output = result
+        
+        plan = output.strip().replace('\n\n', '\n')
+        planning_steps = plan.split('\n')
+        print('planning_steps: ', planning_steps)
+        
+        return {
+            "input": state["input"],
+            "plan": planning_steps
+        }
+        
     def execute_node(state: State, config):
         print("###### execute ######")
         print('input: ', state["input"])
@@ -4468,7 +4461,7 @@ def getResponse(connectionId, jsonBody):
                     msg = run_knowledge_guru(connectionId, requestId, text)      
                 
                 elif convType == 'agent-plan-and-execute':  # plan and execute
-                    msg = run_plan_and_exeucute(connectionId, requestId, text)        
+                    msg = run_planning(connectionId, requestId, text)        
                                                                                 
                 elif convType == 'long-form-writing-agent':  # Multi-agent: long writing
                     msg = run_long_form_writing_agent(connectionId, requestId, text)
