@@ -1570,7 +1570,7 @@ def get_reg_chain(langMode):
         
     human = (
         "Question: {question}"
-        
+
         "Reference Text:"
         "{context}"
     )
@@ -3889,7 +3889,8 @@ def get_reference_of_knoweledge_base(docs, path, doc_prefix):
 #########################################################
 def traslation(chat, text, input_language, output_language):
     system = (
-        "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags. Put it in <result> tags."
+        "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags." 
+        "Put it in <result> tags."
     )
     human = "<article>{text}</article>"
     
@@ -3918,15 +3919,18 @@ def traslation(chat, text, input_language, output_language):
 def summary_of_code(chat, code, mode):
     if mode == 'py':
         system = (
-            "다음의 <article> tag에는 python code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+            "다음의 <article> tag에는 python code가 있습니다."
+            "code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
         )
     elif mode == 'js':
         system = (
-            "다음의 <article> tag에는 node.js code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+            "다음의 <article> tag에는 node.js code가 있습니다." 
+            "code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
         )
     else:
         system = (
-            "다음의 <article> tag에는 code가 있습니다. code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
+            "다음의 <article> tag에는 code가 있습니다."
+            "code의 전반적인 목적에 대해 설명하고, 각 함수의 기능과 역할을 자세하게 한국어 500자 이내로 설명하세요."
         )
     
     human = "<article>{code}</article>"
@@ -3961,24 +3965,23 @@ def revise_question(connectionId, requestId, chat, query):
         
     if isKorean(query)==True :      
         system = (
-            ""
-        )  
-        human = """이전 대화를 참조하여, 다음의 <question>의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요. 새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요.
-        
-        <question>            
-        {question}
-        </question>"""
+            "이전 대화를 참조하여, Question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
+            "새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요."
+        )          
         
     else: 
         system = (
-            ""
+            "Rephrase the Question to be a standalone question."
+            "Put it in <result> tags."
         )
-        human = """Rephrase the follow up <question> to be a standalone question. Put it in <result> tags.
-        <question>            
-        {question}
-        </question>"""
-            
-    prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
+
+    human = ("Question: {question}")   
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system), 
+        MessagesPlaceholder(variable_name="history"), 
+        ("human", human)]
+    )
     # print('prompt: ', prompt)
     
     history = memory_chain.load_memory_variables({})["chat_history"]
