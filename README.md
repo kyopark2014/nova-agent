@@ -1,4 +1,4 @@
-# Amazon Nova와 Agentic Workflow를 이용하여 복잡한 Application 구현하기
+# Amazon Nova 활용하기
 
 여기에서는 Amazon의 Nova와 Agentic Workflow를 이용하여 복잡한 Application을 구현하는것을 설명합니다.
 
