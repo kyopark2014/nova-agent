@@ -48,10 +48,40 @@ for event in stream:
 
 ## RAG
 
+RAG를 통해 얻어진 문서는 아래와 같이 LangChain을 이용해 context로 활용되고 적절한 응답을 얻을 수 있습니다. 
+
+```python
+system = (
+    "당신은 사려깊은 인공지능 도우미입니다." 
+    "다음의 Reference texts를 이용하여 질문에 대한 정확한 답변을 제공합니다."
+    "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+)
+human = (
+    "Question: {input}"
+
+    "Reference texts: "
+    "{context}"
+)
+    
+prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+               
+chain = prompt | chat
+
+stream = chain.invoke(
+    {
+        "context": context,
+        "input": revised_question,
+    }
+)
+msg = readStreamMsg(connectionId, requestId, stream.content)    
+```
+
 ## Multi-modal
 
-## Agent
 
+
+
+## Agent
 
 API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 reasoning로 매번 1개의 action을 줌으로써 reasoning - action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
 
