@@ -3964,24 +3964,29 @@ def revise_question(connectionId, requestId, chat, query):
     isTyping(connectionId, requestId, "revising...")
         
     if isKorean(query)==True :      
-        human = (
-            "최근 대화를 참조하여, 다음의 question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
-            "결과에 <result> tag를 붙여주세요."
-
-            "Question: {question}"
-        )   
+        system = (
+            
+        )          
+        
     else: 
-        human = (
+        system = (
             "Rephrase the Question to be a standalone question."
             "Put it in <result> tags."
+        )
 
-            "Question: {question}"
-        )    
+    human = (
+        "최근 대화를 참조하여, 아래 user의 question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
+        # "Rephrase the user's question to be a standalone question."
+        "결과에 <result> tag를 붙여주세요."
+        
+        "{question}"
+    )   
 
     prompt = ChatPromptTemplate.from_messages([
-        ("human", human), 
-        MessagesPlaceholder(variable_name="history")
-    ])
+        #("system", system), 
+        MessagesPlaceholder(variable_name="history"), 
+        ("human", human)]
+    )
     # print('prompt: ', prompt)
     
     history = memory_chain.load_memory_variables({})["chat_history"]
