@@ -3966,7 +3966,7 @@ def revise_question(connectionId, requestId, chat, query):
     if isKorean(query)==True :      
         system = (
             "이전 대화를 참조하여, Question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
-            "결과는 <result> tag를 붙여주세요."
+            "결과에 <result> tag를 붙여주세요."
         )          
         
     else: 
