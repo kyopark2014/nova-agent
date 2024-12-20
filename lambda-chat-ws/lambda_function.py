@@ -3814,7 +3814,7 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
             "당신은 사려깊은 인공지능 도우미입니다." 
             "다음의 Reference texts를 이용하여 질문에 대한 정확한 답변을 제공합니다."
             "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-            "답변은 markdown 포맷을 사용하지 말고 HTML 형태로 표현합니다."
+            "답변은 markdown 포맷을 사용하지 않습니다."
         )
     else: 
         system = (
