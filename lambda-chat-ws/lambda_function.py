@@ -3966,7 +3966,7 @@ def revise_question(connectionId, requestId, chat, query):
     if isKorean(query)==True :      
         system = (
             "이전 대화를 참조하여, Question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
-            "새로운 질문은 원래 질문의 중요한 단어를 반드시 포함합니다. 결과는 <result> tag를 붙여주세요."
+            "결과는 <result> tag를 붙여주세요."
         )          
         
     else: 
@@ -3997,9 +3997,9 @@ def revise_question(connectionId, requestId, chat, query):
         )
         generated_question = result.content
         print('generated_question: ', generated_question)
-        
+                
         revised_question = generated_question[generated_question.find('<result>')+8:generated_question.find('</result>')-1] 
-        # print('revised_question: ', revised_question)
+        print('revised_question: ', revised_question)
         
     except Exception:
         err_msg = traceback.format_exc()
