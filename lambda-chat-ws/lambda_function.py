@@ -1704,7 +1704,6 @@ def init_enhanced_search():
                 "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
                 "모르는 질문을 받으면 솔직히 모른다고 말합니다."
                 "최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요."
-                "답변은 markdown 포맷을 사용하지 않고 text 형태로 제공합니다."
             )
         else: 
             system = (            
@@ -1712,7 +1711,6 @@ def init_enhanced_search():
                 "If you don't know the answer, just say that you don't know, don't try to make up an answer."
                 "You will be acting as a thoughtful advisor."
                 "Put it in <result> tags."
-                "You will only answer in text format, using markdown format is not allowed."
             )
                 
         prompt = ChatPromptTemplate.from_messages(
@@ -3821,7 +3819,7 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
             "You will be acting as a thoughtful advisor."
             "Provide a concise answer to the question at the end using reference texts." 
             "If you don't know the answer, just say that you don't know, don't try to make up an answer."
-            "You will only answer in text format, using markdown format is not allowed."
+            # "You will only answer in text format, using markdown format is not allowed."
         )    
     human = (
         "Question: {input}"
