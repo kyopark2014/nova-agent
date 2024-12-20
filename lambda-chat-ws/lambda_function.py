@@ -3965,9 +3965,7 @@ def revise_question(connectionId, requestId, chat, query):
         
     if isKorean(query)==True :      
         system = (
-            "최근 대화를 참조하여, 아래 user의 question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
-            # "Rephrase the user's question to be a standalone question."
-            "결과에 <result> tag를 붙여주세요."
+            
         )          
         
     else: 
@@ -3976,10 +3974,16 @@ def revise_question(connectionId, requestId, chat, query):
             "Put it in <result> tags."
         )
 
-    human = ("Question: {question}")   
+    human = (
+        "최근 대화를 참조하여, 아래 user의 question의 뜻을 명확히 하는 새로운 질문을 한국어로 생성하세요."
+        # "Rephrase the user's question to be a standalone question."
+        "결과에 <result> tag를 붙여주세요."
+
+        "{question}"
+    )   
 
     prompt = ChatPromptTemplate.from_messages([
-        ("system", system), 
+        # ("system", system), 
         MessagesPlaceholder(variable_name="history"), 
         ("human", human)]
     )
@@ -4000,7 +4004,7 @@ def revise_question(connectionId, requestId, chat, query):
         print('generated_question: ', generated_question)
                 
         revised_question = generated_question[generated_question.find('<result>')+8:generated_question.find('</result>')-1] 
-        print('revised_question: ', revised_question)
+        # print('revised_question: ', revised_question)
         
     except Exception:
         err_msg = traceback.format_exc()
