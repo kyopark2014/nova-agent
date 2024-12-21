@@ -2575,31 +2575,31 @@ def run_planning(connectionId, requestId, query):
         update_state_message("executing...", config)
         
         plan_str = "\n".join(f"{i+1}. {step}" for i, step in enumerate(plan))
-        #print("plan_str: ", plan_str)
+        print("plan_str: ", plan_str)
         
-        task = plan[0]
-        task_formatted = f"""For the following plan:{plan_str}\n\nYou are tasked with executing step {1}, {task}."""
-        # print("request: ", task_formatted)     
-        request = HumanMessage(content=task_formatted)
-        
-        chat = get_chat()
+        print('task: ', plan[0])
+ 
+        system =  (
+            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+            "답변의 이유를 풀어서 명확하게 설명합니다."
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+        )
+        human = "{input}"
+
         prompt = ChatPromptTemplate.from_messages([
-            (
-                "system", (
-                    "당신의 이름은 서연이고, 질문에 친근한 방식으로 대답하도록 설계된 대화형 AI입니다."
-                    "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
-                    "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-                )
-            ),
-            MessagesPlaceholder(variable_name="messages"),
+            ("system", system),
+            ("human", human)
         ])
+
+        chat = get_chat()
         chain = prompt | chat
         
-        response = chain.invoke({"messages": [request]})
+        response = chain.invoke({"input": plan[0]})
+
         result = response.content
         print('result: ', result)
         
-        print('task: ', task)
+        print('task: ', plan[0])
         print('executor output: ', result)
         
         # print('plan: ', state["plan"])
@@ -2608,7 +2608,7 @@ def run_planning(connectionId, requestId, query):
             "input": state["input"],
             "plan": state["plan"],
             "info": [result],
-            "past_steps": [task],
+            "past_steps": [plan[0]],
         }
             
     class Plan(BaseModel):
@@ -2688,11 +2688,15 @@ def run_planning(connectionId, requestId, query):
         
     def should_end(state: State) -> Literal["continue", "end"]:
         print('#### should_end ####')
-        print('state: ', state)
+        # print('state: ', state)
+        
         if "response" in state and state["response"]:
-            return "end"
+            print('response: ', state["response"])            
+            next = "end"
         else:
-            return "continue"    
+            print('plan: ', state["plan"])
+            next = "continue"
+        print(f"should_end response: {next}")
         
     def final_answer(state: State) -> str:
         print('#### final_answer ####')
@@ -2706,15 +2710,11 @@ def run_planning(connectionId, requestId, query):
         
         if isKorean(query)==True:
             system = (
-                "Assistant의 이름은 서연이고, 질문에 대해 친절하게 답변하는 도우미입니다."
-                "다음의 <context> tag안의 참고자료를 이용하여 질문에 대한 답변합니다."
+                "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+                "다음의 Reference texts을 이용하여 user의 질문에 답변합니다."
                 "답변의 이유를 풀어서 명확하게 설명합니다."
                 "결과는 <result> tag를 붙여주세요."
-                "답변은 markdown 포맷을 사용하지 않고 text 형태로 제공합니다."
-                
-                "<context>"
-                "{context}"
-                "</context>"
+                "답변은 markdown 포맷을 사용하지 않습니다."                            
             )
         else: 
             system = (
@@ -2724,13 +2724,14 @@ def run_planning(connectionId, requestId, query):
                 "If you don't know the answer, just say that you don't know, don't try to make up an answer."
                 "Put it in <result> tags."
                 "You will only answer in text format, using markdown format is not allowed."
-                
-                "<context>"
-                "{context}"
-                "</context>"
             )
     
-        human = "{input}"
+        human = (
+            "Question: {input}"
+
+            "Reference texts:"
+            "{context}"
+        )
         
         prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
         # print('prompt: ', prompt)
@@ -2746,7 +2747,12 @@ def run_planning(connectionId, requestId, query):
                 }
             )
             result = response.content
-            output = result[result.find('<result>')+8:len(result)-9] # remove <result> tag
+
+            if result.find('<result>')==-1:
+                output = result
+            else:
+                output = result[result.find('<result>')+8:result.find('</result>')]
+                
             print('output: ', output)
             
         except Exception:
@@ -3808,10 +3814,12 @@ def query_using_RAG_context(connectionId, requestId, chat, context, revised_ques
                 
     if isKorean(revised_question)==True:
         system = (
-            "당신은 사려깊은 인공지능 도우미입니다." 
-            "다음의 Reference texts를 이용하여 질문에 대한 정확한 답변을 제공합니다."
+            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+            "다음의 Reference texts을 이용하여 user의 질문에 답변합니다."
             "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-            #"답변은 markdown 포맷을 사용하지 않습니다."
+            "답변의 이유를 풀어서 명확하게 설명합니다."
+            "결과는 <result> tag를 붙여주세요."
+            "답변은 markdown 포맷을 사용하지 않습니다."
         )
     else: 
         system = (
