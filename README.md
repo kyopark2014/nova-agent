@@ -158,6 +158,12 @@ search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연�
 
 ![noname](https://github.com/user-attachments/assets/5c81d318-34eb-4948-ab22-42c8502b750f)
 
+### Planning
+
+Planing을 이용하면, CoT(Chain of Thought)형태로 반복적으로 결과를 개선함으로써 향상된 결과를 얻을 수 있습니다. 
+
+![image](https://github.com/user-attachments/assets/4c0086da-865c-44c3-84fa-64246a10f624)
+
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
