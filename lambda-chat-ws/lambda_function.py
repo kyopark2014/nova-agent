@@ -2611,19 +2611,17 @@ def run_planning(connectionId, requestId, query):
             "info": [output],
             "past_steps": [task],
         }
-
+       
     class Response(BaseModel):
         """Response to user."""
         response: str
+
+    def replan_node(state: State, config):
+        print('#### replan ####')
+        # print('state of replan node: ', state)
         
-    class Act(BaseModel):
-        """Action to perform as a json format"""
-        action: Union[Response, Plan] = Field(
-            description="Action to perform. If you want to respond to user, use Response. "
-            "If you need to further use tools to get the answer, use Plan."
-        )
+        update_state_message("replanning...", config)
         
-    def get_replanner():
         replanner_prompt = ChatPromptTemplate.from_template(
             "For the given objective, come up with a simple step by step plan."
             "This plan should involve individual tasks, that if executed correctly will yield the correct answer."
@@ -2649,14 +2647,6 @@ def run_planning(connectionId, requestId, query):
         chat = get_chat()
         replanner = replanner_prompt | chat
         
-        return replanner
-
-    def replan_node(state: State, config):
-        print('#### replan ####')
-        
-        update_state_message("replanning...", config)
-        
-        replanner = get_replanner()
         output = replanner.invoke(state)
         print('replanner output: ', output.content)
         
@@ -2669,18 +2659,18 @@ def run_planning(connectionId, requestId, query):
             
             if not info['parsed'] == None:
                 result = info['parsed']
-                print('act output: ', result)
+                print('replan result: ', result)
                 break
                     
         if result == None:
-            return {"response": "답을 찾지 못하였습니다. 다시 해주세요."}
+            return {"response": "답을 찾지 못하였습니다. 다시 시도해주세요."}
         else:
-            if isinstance(result.action, Response):
+            if isinstance(result.action, Response):  # "parsed":"Act(action=Response(response="
                 return {
                     "response": result.action.response,
                     "info": [result.action.response]
                 }
-            else:
+            else:  # "parsed":"Act(action=Plan(steps=
                 return {"plan": result.action.steps}
         
     def should_end(state: State) -> Literal["continue", "end"]:
