@@ -125,7 +125,7 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 
 ### Reflection
 
-Reflection은 초안을 생성한 후에 개선할 사항을 추출하고 추가 검색을 통해 얻어진 정보를 이용해 향상된 답변을 생성합니다. 따라서 아래와 같이 generate, reflect, revise_answer 노드들을 구성해 workflow를 생성합니다. 
+Reflection 패턴은 초안을 생성한 후에 개선할 사항을 추출하고 추가 검색을 통해 얻어진 정보를 이용해 향상된 답변을 생성합니다. 따라서 아래와 같이 generate, reflect, revise_answer 노드들을 구성해 workflow를 생성합니다. 
 
 ![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
 
@@ -160,7 +160,7 @@ search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연�
 
 ### Planning
 
-Planing을 이용하면, CoT(Chain of Thought)형태로 반복적으로 결과를 개선함으로써 향상된 결과를 얻을 수 있습니다. 
+Planing 패턴을 이용하면, CoT(Chain of Thought)형태로 반복적으로 결과를 개선함으로써 향상된 결과를 얻을 수 있습니다. 
 
 ![image](https://github.com/user-attachments/assets/4c0086da-865c-44c3-84fa-64246a10f624)
 
