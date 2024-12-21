@@ -130,7 +130,7 @@ Reflection은 초안을 생성한 후에 개선할 사항을 추출하고 추가
 ![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
 
 
-Thinking을 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
+Reasoning 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
 
 ```text
 지방 조직이 분비하는 exosome들은 면역 체계에 다양한 역할을 할 수 있습니다. exosome은 세포 간 통신을 위한 중요한 매개체로, 다양한 생물학적 물질을 운반하여 면역 반응을 조절할 수 있습니다. 예를 들어, exosome은 면역 세포의 활성화, 염증 반응의 조절, 그리고 면역 기억의 형성에 관여할 수 있습니다. 
@@ -139,7 +139,7 @@ exosome을 통해 전달되는 신호 분자들은 면역 세포의 기능을 �
 참고로, exosome의 역할과 면역 체계에 대한 연구는 지속적으로 진행되고 있으며, 향후 더 많은 연구 결과가 나올 것으로 기대됩니다.
 ```
 
-reflection에서 도출된 개선 사항입니다. 
+Reflection에서 도출된 개선 사항입니다. 
 
 ```text
 reflection:
@@ -150,7 +150,7 @@ superfluous='건강한 생활 습관, 균형 잡힌 식사, 규칙적인 운동,
 search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연구 결과', 'exosome을 통한 당뇨나 질병 예방에 대한 연구 결과', 'exosome과 면역 체계의 상호작용에 대한 최신 연구 동향'
 ```
 
-개선사항을 반영한 답변입니다. 전체 길이는 572자 입니다. Draft를 reflection를 이용해 개선하였고 길이도 30%정도 증가하였습니다.
+개선사항을 반영한 답변입니다. 전체 길이는 572자 입니다. 초안를 reflection를 이용해 개선하였고 길이도 30%정도 증가하였습니다.
 
 ![noname](https://github.com/user-attachments/assets/c040ca53-ee72-4358-a4a2-2d4ef47199d3)
 
