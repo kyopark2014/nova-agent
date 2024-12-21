@@ -2510,7 +2510,7 @@ def run_self_corrective_rag(connectionId, requestId, query):
 
 
 ####################### LangGraph #######################
-# Planning 
+# Planning (Advanced CoT)
 #########################################################
 def run_planning(connectionId, requestId, query):
     class State(TypedDict):
@@ -2796,7 +2796,7 @@ def run_planning(connectionId, requestId, query):
     return value["answer"]
 
 ####################### LangGraph #######################
-# Knowledge Guru: Reflection
+# Reflection (Knowledge Guru)
 #########################################################
 def run_knowledge_guru(connectionId, requestId, query):
     class State(TypedDict):
