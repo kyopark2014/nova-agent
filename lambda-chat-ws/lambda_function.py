@@ -571,7 +571,7 @@ def isKorean(text):
         return False
 
 def general_conversation(connectionId, requestId, chat, query):
-    if isKorean(query)==True :
+    if isKorean(query)==True:
         system = (
             "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
             "당신은 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
@@ -586,9 +586,13 @@ def general_conversation(connectionId, requestId, chat, query):
             "Do not use markdown format."
         )
     
-    human = "Question: {input}"
+    human = "{input}"
     
-    prompt = ChatPromptTemplate.from_messages([("system", system), MessagesPlaceholder(variable_name="history"), ("human", human)])
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system), 
+        MessagesPlaceholder(variable_name="history"), 
+        ("human", human)
+    ])
     # print('prompt: ', prompt)
     
     history = memory_chain.load_memory_variables({})["chat_history"]
