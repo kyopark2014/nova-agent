@@ -2589,7 +2589,6 @@ def run_planning(connectionId, requestId, query):
                     "당신의 이름은 서연이고, 질문에 친근한 방식으로 대답하도록 설계된 대화형 AI입니다."
                     "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
                     "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-                    "결과는 <result> tag를 붙여주세요."
                 )
             ),
             MessagesPlaceholder(variable_name="messages"),
@@ -2599,27 +2598,36 @@ def run_planning(connectionId, requestId, query):
         response = chain.invoke({"messages": [request]})
         result = response.content
         print('result: ', result)
-
-        if result.find('<result>'):
-            output = result[result.find('<result>')+8:result.find('</result>')] 
-        else:
-            output = result
         
         print('task: ', task)
-        print('executor output: ', output)
+        print('executor output: ', result)
         
         # print('plan: ', state["plan"])
         # print('past_steps: ', task)        
         return {
             "input": state["input"],
             "plan": state["plan"],
-            "info": [output],
+            "info": [result],
             "past_steps": [task],
         }
-       
+            
+    class Plan(BaseModel):
+        """List of steps as a json format"""
+
+        steps: List[str] = Field(
+            description="different steps to follow, should be in sorted order"
+        )
+
     class Response(BaseModel):
         """Response to user."""
-        response: str
+        response: str    
+
+    class Act(BaseModel):
+        """Action to perform as a json format"""
+        action: Union[Response, Plan] = Field(
+            description="Action to perform. If you want to respond to user, use Response. "
+            "If you need to further use tools to get the answer, use Plan."
+        )
 
     def replan_node(state: State, config):
         print('#### replan ####')
