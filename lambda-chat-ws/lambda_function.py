@@ -2795,7 +2795,7 @@ def run_planning(connectionId, requestId, query):
     return value["answer"]
 
 ####################### LangGraph #######################
-# Knowledge Guru
+# Knowledge Guru: Reflection
 #########################################################
 def run_knowledge_guru(connectionId, requestId, query):
     class State(TypedDict):
@@ -2867,15 +2867,16 @@ def run_knowledge_guru(connectionId, requestId, query):
         
         update_state_message("revising...", config)
         
-        system = """Revise your previous answer using the new information. 
-You should use the previous critique to add important information to your answer. provide the final answer with <result> tag. 
-<critique>
-{reflection}
-</critique>
+        system = (
+            "Revise your previous answer using the new information."
+            "You should use the previous critique to add important information to your answer." 
+            "provide the final answer with <result> tag."
+            "critique:"
+            "{reflection}"
 
-<information>
-{content}
-</information>"""
+            "information:"
+            "{content}"
+        )
                     
         reflection_prompt = ChatPromptTemplate.from_messages(
             [
