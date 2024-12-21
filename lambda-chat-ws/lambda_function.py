@@ -78,7 +78,7 @@ separated_chat_history = os.environ.get('separated_chat_history')
 enableParentDocumentRetrival = os.environ.get('enableParentDocumentRetrival')
 enableHybridSearch = os.environ.get('enableHybridSearch')
 useParrelWebSearch = True
-useEnhancedSearch = False
+useEnhancedSearch = True
 vectorIndexName = os.environ.get('vectorIndexName')
 index_name = vectorIndexName
 grade_state = "LLM" # LLM, PRIORITY_SEARCH, OTHERS
@@ -1765,7 +1765,10 @@ def enhanced_search(query, config):
     message = result["messages"][-1]
     print('enhanced_search: ', message)
 
-    return message.content[message.content.find('<result>')+8:len(message.content)-9]
+    if message.content.find('<result>')==-1:
+        return message.content
+    else:
+        return message.content[message.content.find('<result>')+8:message.content.find('</result>')]
 
 class GradeDocuments(BaseModel):
     """Binary score for relevance check on retrieved documents."""
@@ -2506,10 +2509,8 @@ def run_self_corrective_rag(connectionId, requestId, query):
     return value["messages"][-1].content
 
 
-
-
 ####################### LangGraph #######################
-# Plan and Execute
+# Planning 
 #########################################################
 def run_planning(connectionId, requestId, query):
     class State(TypedDict):
@@ -4462,7 +4463,7 @@ def getResponse(connectionId, jsonBody):
                 elif convType == 'agent-knowledge-guru':  # Refection: knowledge guru 
                     msg = run_knowledge_guru(connectionId, requestId, text)      
                 
-                elif convType == 'agent-plan-and-execute':  # plan and execute
+                elif convType == 'agent-plan-and-execute':  # Planning
                     msg = run_planning(connectionId, requestId, text)        
                                                                                 
                 elif convType == 'long-form-writing-agent':  # Multi-agent: long writing
