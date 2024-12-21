@@ -78,7 +78,7 @@ separated_chat_history = os.environ.get('separated_chat_history')
 enableParentDocumentRetrival = os.environ.get('enableParentDocumentRetrival')
 enableHybridSearch = os.environ.get('enableHybridSearch')
 useParrelWebSearch = True
-useEnhancedSearch = True
+useEnhancedSearch = False
 vectorIndexName = os.environ.get('vectorIndexName')
 index_name = vectorIndexName
 grade_state = "LLM" # LLM, PRIORITY_SEARCH, OTHERS
@@ -616,7 +616,7 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-def get_answer_using_opensearch(chat, text, connectionId, requestId):    
+def get_answer_using_opensearch(connectionId, requestId, chat, text):    
     msg = ""
     top_k = 4
     relevant_docs = []
@@ -2888,7 +2888,7 @@ def run_knowledge_guru(connectionId, requestId, query):
         )
             
         content = []        
-        if useEnhancedSearch:
+        if useEnhancedSearch: # search agent
             for q in state["search_queries"]:
                 response = enhanced_search(q, config)
                 # print(f'q: {q}, response: {response}')
@@ -4434,12 +4434,12 @@ def getResponse(connectionId, jsonBody):
                     
                 ########## RAG ##########
                 elif convType == 'rag-opensearch':   # RAG - Vector
-                    msg = get_answer_using_opensearch(chat, text, connectionId, requestId)                    
+                    msg = get_answer_using_opensearch(connectionId, requestId, chat, text)                    
 
                 elif convType == 'rag-opensearch-chat':   # RAG - Vector
                     revised_question = revise_question(connectionId, requestId, chat, text)     
                     print('revised_question: ', revised_question)
-                    msg = get_answer_using_opensearch(chat, revised_question, connectionId, requestId)                    
+                    msg = get_answer_using_opensearch(connectionId, requestId, chat, revised_question)                    
                         
                 elif convType == 'agent-crag':  # corrective RAG
                     msg = run_corrective_rag(connectionId, requestId, text)
