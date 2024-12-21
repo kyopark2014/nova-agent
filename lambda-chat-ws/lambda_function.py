@@ -2867,10 +2867,11 @@ def run_knowledge_guru(connectionId, requestId, query):
         
         update_state_message("revising...", config)
         
-        system = (
+        human = (
             "Revise your previous answer using the new information."
             "You should use the previous critique to add important information to your answer." 
             "provide the final answer with <result> tag."
+
             "critique:"
             "{reflection}"
 
@@ -2880,8 +2881,10 @@ def run_knowledge_guru(connectionId, requestId, query):
                     
         reflection_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", system),
+                #("system", system),
                 MessagesPlaceholder(variable_name="messages"),
+
+                ("human", human),
             ]
         )
             
@@ -2889,7 +2892,7 @@ def run_knowledge_guru(connectionId, requestId, query):
         if useEnhancedSearch:
             for q in state["search_queries"]:
                 response = enhanced_search(q, config)
-                print(f'q: {q}, response: {response}')
+                # print(f'q: {q}, response: {response}')
                 content.append(response)                   
         else:
             search = TavilySearchResults(max_results=2)
