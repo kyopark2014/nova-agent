@@ -125,6 +125,11 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
 
 ### Reflection
 
+Reflection은 초안을 생성한 후에 개선할 사항을 추출하고 추가 검색을 통해 얻어진 정보를 이용해 향상된 답변을 생성합니다. 따라서 아래와 같이 generate, reflect, revise_answer 노드들을 구성해 workflow를 생성합니다. 
+
+![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
+
+
 Thinking을 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
 
 ```text
