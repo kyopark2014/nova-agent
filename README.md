@@ -149,7 +149,8 @@ search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연�
 
 ![noname](https://github.com/user-attachments/assets/c040ca53-ee72-4358-a4a2-2d4ef47199d3)
 
-아래와 같이 tavily를 이용해 검색한 결과로 초안을 만들고 
+전체 동작을 LangSmith를 이용해 확인하면 아래와 같습니다. 전체적으로 47초가 소요되었습니다. 먼저 reasoning을 통해 질문에서 2개의 검색어를 추출하여 tavily로 검색을 한 후에 초안을 생성하였습니다. 이후 개선할 사항을 추출하고 이를 반영하기 위하여 3회 추가 검색을 수행하여 최종 답변을 생성하였습니다.
+
 ![image](https://github.com/user-attachments/assets/b5a1611c-ce2b-4961-8862-ef5b5318ac30)
 
 
