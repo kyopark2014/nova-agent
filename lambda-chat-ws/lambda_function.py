@@ -2881,9 +2881,7 @@ def run_knowledge_guru(connectionId, requestId, query):
                     
         reflection_prompt = ChatPromptTemplate.from_messages(
             [
-                #("system", system),
                 MessagesPlaceholder(variable_name="messages"),
-
                 ("human", human),
             ]
         )
@@ -2921,7 +2919,7 @@ def run_knowledge_guru(connectionId, requestId, query):
         )    
                                 
         response = HumanMessage(content=res.content[res.content.find('<result>')+8:len(res.content)-9])
-        print('response: ', response)
+        print('revised_answer: ', response.content)
                 
         revision_number = state["revision_number"] if state.get("revision_number") is not None else 1
         return {
