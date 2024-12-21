@@ -2598,7 +2598,12 @@ def run_planning(connectionId, requestId, query):
         
         response = chain.invoke({"messages": [request]})
         result = response.content
-        output = result[result.find('<result>')+8:len(result)-9] # remove <result> tag
+        print('result: ', result)
+
+        if result.find('<result>'):
+            output = result[result.find('<result>')+8:result.find('</result>')] 
+        else:
+            output = result
         
         print('task: ', task)
         print('executor output: ', output)
