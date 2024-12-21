@@ -130,7 +130,7 @@ Reflection은 초안을 생성한 후에 개선할 사항을 추출하고 추가
 ![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
 
 
-Reasoning 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
+Reasoning을 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
 
 ```text
 지방 조직이 분비하는 exosome들은 면역 체계에 다양한 역할을 할 수 있습니다. exosome은 세포 간 통신을 위한 중요한 매개체로, 다양한 생물학적 물질을 운반하여 면역 반응을 조절할 수 있습니다. 예를 들어, exosome은 면역 세포의 활성화, 염증 반응의 조절, 그리고 면역 기억의 형성에 관여할 수 있습니다. 
