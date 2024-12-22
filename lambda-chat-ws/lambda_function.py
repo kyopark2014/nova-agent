@@ -2566,6 +2566,11 @@ def run_planning(connectionId, requestId, query):
         update_state_message("executing...", config)
         chat = get_chat()
 
+        requestId = config.get("configurable", {}).get("requestId", "")
+        print('requestId: ', requestId)
+        connectionId = config.get("configurable", {}).get("connectionId", "")
+        print('connectionId: ', connectionId)
+
         # retrieve
         isTyping(connectionId, requestId, "retrieving...")
         relevant_docs = retrieve_documents_from_opensearch(plan[0], top_k=4)
@@ -2612,7 +2617,7 @@ def run_planning(connectionId, requestId, query):
 
     def replan_node(state: State, config):
         print('#### replan ####')
-        # print('state of replan node: ', state)
+        print('state of replan node: ', state)
         
         update_state_message("replanning...", config)
         
@@ -2641,7 +2646,11 @@ def run_planning(connectionId, requestId, query):
         chat = get_chat()
         replanner = replanner_prompt | chat
         
-        output = replanner.invoke(state)
+        output = replanner.invoke({
+            "input": state["input"],
+            "plan": state["plan"],
+            "past_steps": state["past_steps"]
+        })
         print('replanner output: ', output.content)
         
         result = None
