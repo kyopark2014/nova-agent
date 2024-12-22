@@ -2597,24 +2597,6 @@ def run_planning(connectionId, requestId, query):
             "past_steps": [plan[0]],
         }
             
-    class Plan(BaseModel):
-        """List of steps as a json format"""
-
-        steps: List[str] = Field(
-            description="different steps to follow, should be in sorted order"
-        )
-
-    class Response(BaseModel):
-        """Response to user."""
-        response: str    
-
-    class Act(BaseModel):
-        """Action to perform as a json format"""
-        action: Union[Response, Plan] = Field(
-            description="Action to perform. If you want to respond to user, use Response. "
-            "If you need to further use tools to get the answer, use Plan."
-        )
-
     def replan_node(state: State, config):
         print('#### replan ####')
         print('state of replan node: ', state)
@@ -2669,7 +2651,7 @@ def run_planning(connectionId, requestId, query):
         if result.find('<plan>') == -1:
             return {"response":response.content}
         else:
-            plans = output.strip().replace('\n\n', '\n')
+            plans = result.strip().replace('\n\n', '\n')
             planning_steps = plans.split('\n')
             print('planning_steps: ', planning_steps)
             return {"plan": planning_steps}
