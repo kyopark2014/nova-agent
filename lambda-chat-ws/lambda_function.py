@@ -3436,13 +3436,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             ('human', write_template)
         ])
         
-        text = ""
-        drafts = []
         if len(planning_steps) > 50:
             print("plan is too long")
             # print(plan)
             return
         
+        text = ""
+        drafts = []
         for idx, step in enumerate(planning_steps):
             update_state_message(f"executing... (step: {idx+1}/{len(planning_steps)})", config)
             
@@ -3457,10 +3457,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "STEP": step
             })            
             output = result.content
-            # print('output: ', output)
+            print('output: ', output)
             
-            draft = output[output.find('<result>')+8:len(output)-9]
-            # print('draft: ', draft) 
+            if output.find('<result>')==-1:
+                draft = output
+            else:
+                draft = output[output.find('<result>')+8:output.find('</result>')]
+            #print('draft: ', draft) 
                        
             if draft.find('#')!=-1 and draft.find('#')!=0:
                 draft = draft[draft.find('#'):]
