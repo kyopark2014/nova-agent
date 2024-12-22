@@ -620,7 +620,7 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-def generate_answer(connectionId, requestId, chat, relevant_docs, text):    
+def generate_answer(chat, relevant_docs, text):    
     relevant_context = ""
     for document in relevant_docs:
         relevant_context = relevant_context + document.page_content + "\n\n"        
@@ -679,7 +679,56 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
             
     # generate
     isTyping(connectionId, requestId, "generating...")                  
-    msg = generate_answer(connectionId, requestId, chat, relevant_docs, text)
+    relevant_context = ""
+    for document in relevant_docs:
+        relevant_context = relevant_context + document.page_content + "\n\n"        
+    # print('relevant_context: ', relevant_context)
+
+    if isKorean(text)==True:
+        system = (
+            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+            "다음의 Reference texts을 이용하여 user의 질문에 답변합니다."
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+            "답변의 이유를 풀어서 명확하게 설명합니다."
+            "결과는 <result> tag를 붙여주세요."
+            "답변은 markdown 포맷을 사용하지 않습니다."
+        )
+    else: 
+        system = (
+            "You will be acting as a thoughtful advisor."
+            "Provide a concise answer to the question at the end using reference texts." 
+            "If you don't know the answer, just say that you don't know, don't try to make up an answer."
+            "You will only answer in text format, using markdown format is not allowed."
+        )    
+    human = (
+        "Question: {input}"
+
+        "Reference texts: "
+        "{context}"
+    )
+    
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    # print('prompt: ', prompt)
+                       
+    chain = prompt | chat
+    
+    msg = ""    
+    try: 
+        stream = chain.invoke(
+            {
+                "context": relevant_context,
+                "input": text,
+            }
+        )
+        msg = readStreamMsg(connectionId, requestId, stream.content)    
+        print('msg: ', msg)
+        
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)        
+            
+        sendErrorMessage(connectionId, requestId, err_msg)    
+        raise Exception ("Not able to request to LLM")
       
     return msg
 
@@ -2529,7 +2578,7 @@ def run_planning(connectionId, requestId, query):
                 
         # generate
         isTyping(connectionId, requestId, "generating...")                  
-        result = generate_answer(connectionId, requestId, chat, relevant_docs, plan[0])        
+        result = generate_answer(chat, relevant_docs, plan[0])
         
         print('task: ', plan[0])
         print('executor output: ', result)
