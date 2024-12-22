@@ -1013,85 +1013,30 @@ def search_by_opensearch(keyword: str) -> str:
     keyword = keyword.replace('\n','')
     print('modified keyword: ', keyword)
     
-    top_k = 2    
-    relevant_docs = [] 
-    if enableParentDocumentRetrival == 'true': # parent/child chunking
-        relevant_documents = retrieve_documents_from_opensearch(keyword, top_k)
-                        
-        for i, document in enumerate(relevant_documents):
-            #print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
-            parent_doc_id = document[0].metadata['parent_doc_id']
-            doc_level = document[0].metadata['doc_level']
-            #print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
-            
-            excerpt, name, url = get_parent_content(parent_doc_id) # use pareant document
-            #print(f"parent_doc_id: {parent_doc_id}, doc_level: {doc_level}, url: {url}, content: {excerpt}")
-            
-            relevant_docs.append(
-                Document(
-                    page_content=excerpt,
-                    metadata={
-                        'name': name,
-                        'url': url,
-                        'doc_level': doc_level,
-                        'from': 'vector'
-                    },
-                )
-            )
-    else: 
-        relevant_documents = vectorstore_opensearch.similarity_search_with_score(
-            query = keyword,
-            k = top_k,
-        )
-
-        for i, document in enumerate(relevant_documents):
-            #print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
-            excerpt = document[0].page_content
-            
-            url = ""
-            if "url" in document[0].metadata:
-                url = document[0].metadata['url']
-                
-            name = document[0].metadata['name']
-            
-            relevant_docs.append(
-                Document(
-                    page_content=excerpt,
-                    metadata={
-                        'name': name,
-                        'url': url,
-                        'from': 'vector'
-                    },
-                )
-            )
-    
-    if enableHybridSearch == 'true':
-        relevant_docs += lexical_search(keyword, top_k)
-    
+    # retrieve
+    relevant_docs = retrieve_documents_from_opensearch(keyword, top_k=2)                            
     print('relevant_docs length: ', len(relevant_docs))
-                
+
+    # grade  
     filtered_docs = grade_documents(keyword, relevant_docs)
         
     for i, doc in enumerate(filtered_docs):
         if len(doc.page_content)>=100:
             text = doc.page_content[:100]
         else:
-            text = doc.page_content
-            
+            text = doc.page_content            
         print(f"filtered doc[{i}]: {text}, metadata:{doc.metadata}")
        
-    relevant_docs = "" 
+    relevant_context = "" 
     for doc in filtered_docs:
         content = doc.page_content
         
-        relevant_docs = relevant_docs + f"{content}\n\n"
+        relevant_context = relevant_context + f"{content}\n\n"
 
     if len(relevant_docs) == 0:
-        relevant_docs = "No relevant documents found."
+        relevant_context = "No relevant documents found."
         
-    return relevant_docs
+    return relevant_context
 
 def lexical_search(query, top_k):
     # lexical search (keyword)
