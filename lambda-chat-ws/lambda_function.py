@@ -177,7 +177,7 @@ def check_tavily_secret(tavily_api_key):
             tavily_client = TavilyClient(api_key=key)
             response = tavily_client.search(query, max_results=1)
             # print('tavily response: ', response)
-            
+
             if 'results' in response and len(response['results']):
                 print('the valid tavily api keys: ', i)
                 valid_keys = key
