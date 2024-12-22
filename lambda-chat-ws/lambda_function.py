@@ -3449,10 +3449,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             chat = get_chat()
             write_chain = write_prompt | chat
             
-            # print('instruction:', instruction)
-            # print('planning_steps:', planning_steps)
-            # print('text:', text)
-            # print('step:', step)
+            print('instruction:', instruction)
+            print('planning_steps:', planning_steps)
+            print('text:', text)
+            print('step:', step)
 
             result = write_chain.invoke({
                 "intruction": instruction,
