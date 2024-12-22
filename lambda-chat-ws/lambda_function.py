@@ -191,7 +191,7 @@ def check_tavily_secret(tavily_api_key):
 tavily_key = check_tavily_secret(tavily_api_key)
 # print('tavily_api_key: ', tavily_api_key)
 os.environ["TAVILY_API_KEY"] = tavily_key
-      
+
 def tavily_search(query, k):
     docs = []    
     try:
