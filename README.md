@@ -188,6 +188,11 @@ plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 �
 
 ![noname](https://github.com/user-attachments/assets/8f1e5860-ebf1-402f-880d-28da222197e3)
 
+### Multi-agent Collaboration
+
+아래는 Multi-agent Collaboration의 결과의 일부분입니다. 
+![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
+
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
