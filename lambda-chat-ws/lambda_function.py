@@ -3399,7 +3399,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
                 "이미 작성된 텍스트를 반복하지 말고 작성한 문단만 출력하세요."                
                 "Markdown 포맷으로 서식을 작성하세요."
-                #"결과는 <result> tag를 붙여주세요."
             )
         else:    
             write_template = (
@@ -3428,7 +3427,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "- Headings: # for main, ## for sections, ### for subsections, etc."
                 "- Lists: * or - for bulleted, 1. 2. 3. for numbered"
                 "- Do not repeat yourself"
-                #"Provide the final answer with <result> tag."
             )
 
         write_prompt = ChatPromptTemplate([
