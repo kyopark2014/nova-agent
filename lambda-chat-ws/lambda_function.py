@@ -3368,7 +3368,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         }
         
     def execute_node(state: State, config):
-        print("###### write (execute) ######")        
+        print("###### execute_node ######")        
         instruction = state["instruction"]
         planning_steps = state["planning_steps"]
         print('instruction: ', instruction)
@@ -3399,7 +3399,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
                 "이미 작성된 텍스트를 반복하지 말고 작성한 문단만 출력하세요."                
                 "Markdown 포맷으로 서식을 작성하세요."
-                "최종 결과에 <result> tag를 붙여주세요."
+                "결과는 <result> tag를 붙여주세요."
             )
         else:    
             write_template = (
@@ -3429,7 +3429,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "- Lists: * or - for bulleted, 1. 2. 3. for numbered"
                 "- Do not repeat yourself"
                 "Provide the final answer with <result> tag."
-                #"Provide the final answer using Korean with <result> tag."
             )
 
         write_prompt = ChatPromptTemplate([
