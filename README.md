@@ -197,6 +197,7 @@ plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 �
 
 ![image](https://github.com/user-attachments/assets/5daa6eb3-7b0c-41d3-9f08-1ee6c974252e)
 
+이때, 사용된 입력과 출력 token의 숫자는 각각 19,328과 7,787입니다. 
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
