@@ -691,6 +691,46 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
       
     return msg
 
+def retrieve_documents_from_tavily(query, top_k):
+    print("###### retrieve_documents_from_opensearch ######")
+
+    relevant_documents = []
+    search = TavilySearchResults(
+        max_results=top_k,
+        include_answer=True,
+        include_raw_content=True,
+        search_depth="advanced", 
+        include_domains=["google.com", "naver.com"]
+    )
+                    
+    try: 
+        output = search.invoke(query)
+        # print('tavily output: ', output)
+            
+        for result in output:
+            print('result of tavily: ', result)
+            if result:
+                content = result.get("content")
+                url = result.get("url")
+                
+                relevant_documents.append(
+                    Document(
+                        page_content=content,
+                        metadata={
+                            'name': 'WWW',
+                            'url': url,
+                            'from': 'tavily'
+                        },
+                    )
+                )                
+    
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)                    
+        # raise Exception ("Not able to request to tavily")   
+
+    return relevant_documents 
+        
 def retrieve_documents_from_opensearch(query, top_k):
     print("###### retrieve_documents_from_opensearch ######")
 
@@ -2483,24 +2523,22 @@ def run_planning(connectionId, requestId, query):
         print('plan: ', plan) 
         
         update_state_message("executing...", config)
-        
-        system =  (
-            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
-            "답변의 이유를 풀어서 명확하게 설명합니다."
-            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-        )
-        human = "{input}"
-
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", system),
-            ("human", human)
-        ])
-
         chat = get_chat()
-        chain = prompt | chat
-        
-        response = chain.invoke({"input": plan[0]})
 
+        # retrieve
+        isTyping(connectionId, requestId, "retrieving...")
+        relevant_docs = retrieve_documents_from_opensearch(plan[0], top_k=4)
+        relevant_docs += retrieve_documents_from_tavily(plan[0], top_k=4)
+            
+        # grade
+        isTyping(connectionId, requestId, "grading...")    
+        filtered_docs = grade_documents(plan[0], relevant_docs) # grading    
+        filtered_docs = check_duplication(filtered_docs) # check duplication
+                
+        # generate
+        isTyping(connectionId, requestId, "generating...")                  
+        response = generate_answer(connectionId, requestId, chat, relevant_docs, plan[0])
+        
         result = response.content
         print('result: ', result)
         
