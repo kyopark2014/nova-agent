@@ -2657,7 +2657,7 @@ def run_planning(connectionId, requestId, query):
             plans = output.strip().replace('\n\n', '\n')
             planning_steps = plans.split('\n')
             print('planning_steps: ', planning_steps)
-            
+
             return {"plan": planning_steps}
         
     def should_end(state: State) -> Literal["continue", "end"]:
@@ -2671,6 +2671,8 @@ def run_planning(connectionId, requestId, query):
             print('plan: ', state["plan"])
             next = "continue"
         print(f"should_end response: {next}")
+        
+        return next
         
     def final_answer(state: State) -> str:
         print('#### final_answer ####')
