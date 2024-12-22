@@ -159,12 +159,12 @@ try:
     get_tavily_api_secret = secretsmanager.get_secret_value(
         SecretId=f"tavilyapikey-{projectName}"
     )
-    print('get_tavily_api_secret: ', get_tavily_api_secret)
+    #print('get_tavily_api_secret: ', get_tavily_api_secret)
     secret = json.loads(get_tavily_api_secret['SecretString'])
-    print('secret: ', secret)
+    #print('secret: ', secret)
     if secret['tavily_api_key']:
         tavily_api_key = json.loads(secret['tavily_api_key'])
-    print('tavily_api_key: ', tavily_api_key)
+    #print('tavily_api_key: ', tavily_api_key)
 except Exception as e: 
     raise e
 
@@ -724,7 +724,7 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
     return msg
 
 def retrieve_documents_from_tavily(query, top_k):
-    print("###### retrieve_documents_from_opensearch ######")
+    print("###### retrieve_documents_from_tavily ######")
 
     relevant_documents = []
     search = TavilySearchResults(
@@ -3382,26 +3382,18 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "아래와 같이 원본 글쓰기 지시사항과 계획한 글쓰기 단계를 제공하겠습니다."
                 "또한 제가 이미 작성한 텍스트를 제공합니다."
 
-                "글쓰기 지시사항:"
-                "<instruction>"
+                "Instruction:"
                 "{intructions}"
-                "</instruction>"
 
-                "글쓰기 단계:"
-                "<plan>"
+                "Plan:"
                 "{plan}"
-                "</plan>"
 
-                "이미 작성한 텍스트:"
-                "<text>"
+                "Written text:"
                 "{text}"
-                "</text>"
 
                 "글쓰기 지시 사항, 글쓰기 단계, 이미 작성된 텍스트를 참조하여 다음 단계을 계속 작성합니다."
-                "다음 단계:"
-                "<step>"
+                "Next step:"
                 "{STEP}"
-                "</step>"
                 
                 "글이 끊어지지 않고 잘 이해되도록 하나의 문단을 충분히 길게 작성합니다."
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
@@ -3416,20 +3408,17 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "I will also provide you with the text I have already written."
                 "Please help me continue writing the next paragraph based on the writing instruction, writing steps, and the already written text."
 
-                "Writing instruction:"
-                "<instruction>"
+                "Instruction:"
                 "{intructions}"
-                "</instruction>"
 
-                "Writing steps:"
-                "<plan>"
+                "Plan:"
                 "{plan}"
-                "</plan>"
 
-                "Already written text:"
-                "<text>"
+                "Written text:"
                 "{text}"
-                "</text>"
+
+                "Next step:"
+                "{STEP}"
 
                 "Please integrate the original writing instruction, writing steps, and the already written text, and now continue writing {STEP}."
                 "If needed, you can add a small subtitle at the beginning."
