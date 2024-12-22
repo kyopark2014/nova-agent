@@ -634,14 +634,12 @@ def generate_answer(connectionId, requestId, chat, relevant_docs, text):
             "모르는 질문을 받으면 솔직히 모른다고 말합니다."
             "답변의 이유를 풀어서 명확하게 설명합니다."
             "결과는 <result> tag를 붙여주세요."
-            "답변은 markdown 포맷을 사용하지 않습니다."
         )
     else: 
         system = (
             "You will be acting as a thoughtful advisor."
             "Provide a concise answer to the question at the end using reference texts." 
             "If you don't know the answer, just say that you don't know, don't try to make up an answer."
-            # "You will only answer in text format, using markdown format is not allowed."
         )    
     human = (
         "Question: {input}"
@@ -660,8 +658,14 @@ def generate_answer(connectionId, requestId, chat, relevant_docs, text):
         "input": text,
     })
     print('response.content: ', response.content)
+
+    if response.content.find('<result>') == -1:
+        output = response.content
+    else:
+        output = response.content[response.content.find('<result>')+8:response.content.find('</result>')]        
+    print('output: ', output)
          
-    return response.content
+    return output
 
 def get_answer_using_opensearch(connectionId, requestId, chat, text):
     # retrieve
