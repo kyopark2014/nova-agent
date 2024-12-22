@@ -152,7 +152,7 @@ if langsmith_api_key:
     os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
     os.environ["LANGCHAIN_TRACING_V2"] = "true"
     os.environ["LANGCHAIN_PROJECT"] = langchain_project
-    
+
 # api key to use Tavily Search
 tavily_api_key = []
 try:
@@ -167,7 +167,7 @@ try:
     print('tavily_api_key: ', tavily_api_key)
 except Exception as e: 
     raise e
- 
+
 def check_tavily_secret(tavily_api_key):
     query = 'what is LangGraph'
     valid_keys = ""
