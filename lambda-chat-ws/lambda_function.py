@@ -655,25 +655,13 @@ def generate_answer(connectionId, requestId, chat, relevant_docs, text):
                        
     chain = prompt | chat
     
-    msg = ""    
-    try: 
-        stream = chain.invoke(
-            {
-                "context": relevant_context,
-                "input": text,
-            }
-        )
-        msg = readStreamMsg(connectionId, requestId, stream.content)    
-        print('msg: ', msg)
-        
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)        
-            
-        sendErrorMessage(connectionId, requestId, err_msg)    
-        raise Exception ("Not able to request to LLM")
-             
-    return msg
+    response = chain.invoke({
+        "context": relevant_context,
+        "input": text,
+    })
+    print('response.content: ', response.content)
+         
+    return response.content
 
 def get_answer_using_opensearch(connectionId, requestId, chat, text):
     # retrieve
@@ -2537,10 +2525,7 @@ def run_planning(connectionId, requestId, query):
                 
         # generate
         isTyping(connectionId, requestId, "generating...")                  
-        response = generate_answer(connectionId, requestId, chat, relevant_docs, plan[0])
-        
-        result = response.content
-        print('result: ', result)
+        result = generate_answer(connectionId, requestId, chat, relevant_docs, plan[0])        
         
         print('task: ', plan[0])
         print('executor output: ', result)
