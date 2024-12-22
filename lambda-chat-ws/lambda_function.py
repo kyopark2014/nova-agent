@@ -678,7 +678,7 @@ def generate_answer(connectionId, requestId, chat, relevant_docs, text):
 def get_answer_using_opensearch(connectionId, requestId, chat, text):
     # retrieve
     isTyping(connectionId, requestId, "retrieving...")
-    relevant_docs = retrieval_documents(text)
+    relevant_docs = retrieve_documents_from_opensearch(text, top_k=4)
         
     # grade
     isTyping(connectionId, requestId, "grading...")    
@@ -691,9 +691,8 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
       
     return msg
 
-def retrieval_documents(query):
-    top_k = 4
-    print("###### retrieval_documents ######")
+def retrieve_documents_from_opensearch(query, top_k):
+    print("###### retrieve_documents_from_opensearch ######")
 
     # Vector Search
     bedrock_embedding = get_embedding()       
@@ -1014,23 +1013,10 @@ def search_by_opensearch(keyword: str) -> str:
     keyword = keyword.replace('\n','')
     print('modified keyword: ', keyword)
     
-    bedrock_embedding = get_embedding()
-        
-    vectorstore_opensearch = OpenSearchVectorSearch(
-        index_name = index_name,
-        is_aoss = False,
-        ef_search = 1024, # 512(default)
-        m=48,
-        #engine="faiss",  # default: nmslib
-        embedding_function = bedrock_embedding,
-        opensearch_url=opensearch_url,
-        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
-    )     
-    top_k = 2
-    
+    top_k = 2    
     relevant_docs = [] 
     if enableParentDocumentRetrival == 'true': # parent/child chunking
-        relevant_documents = retrieval_documents(vectorstore_opensearch, keyword, top_k)
+        relevant_documents = retrieve_documents_from_opensearch(keyword, top_k)
                         
         for i, document in enumerate(relevant_documents):
             #print(f'## Document(opensearch-vector) {i+1}: {document}')
@@ -1933,7 +1919,7 @@ def run_corrective_rag(connectionId, requestId, query):
         print("###### retrieve ######")
         question = state["question"]
         
-        docs = retrieval_documents(question)
+        docs = retrieve_documents_from_opensearch(question, top_k=4)
         
         return {"documents": docs, "question": question}
 
@@ -2119,7 +2105,7 @@ def run_self_rag(connectionId, requestId, query):
         
         update_state_message("retrieving...", config)
         
-        docs = retrieval_documents(question)
+        docs = retrieve_documents_from_opensearch(question, top_k=4)
         
         return {"documents": docs, "question": question}
     
@@ -2334,7 +2320,7 @@ def run_self_corrective_rag(connectionId, requestId, query):
         
         update_state_message("retrieving...", config)
         
-        docs = retrieval_documents(question)
+        docs = retrieve_documents_from_opensearch(question, top_k=4)
         
         return {"documents": docs, "question": question, "web_fallback": True}
 
