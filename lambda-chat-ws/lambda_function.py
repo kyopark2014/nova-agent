@@ -3383,7 +3383,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "또한 제가 이미 작성한 텍스트를 제공합니다."
 
                 "Instruction:"
-                "{intructions}"
+                "{intruction}"
 
                 "Plan:"
                 "{plan}"
@@ -3409,7 +3409,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "Please help me continue writing the next paragraph based on the writing instruction, writing steps, and the already written text."
 
                 "Instruction:"
-                "{intructions}"
+                "{intruction}"
 
                 "Plan:"
                 "{plan}"
@@ -3449,13 +3449,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             chat = get_chat()
             write_chain = write_prompt | chat
             
-            print('instruction:', instruction)
-            print('planning_steps:', planning_steps)
-            print('text:', text)
-            print('step:', step)
+            # print('instruction:', instruction)
+            # print('planning_steps:', planning_steps)
+            # print('text:', text)
+            # print('step:', step)
 
             result = write_chain.invoke({
-                "intructions": instruction,
+                "intruction": instruction,
                 "plan": planning_steps,
                 "text": text,
                 "STEP": step
@@ -3467,10 +3467,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 draft = output
             else:
                 draft = output[output.find('<result>')+8:output.find('</result>')]
-            #print('draft: ', draft) 
+            print('draft: ', draft) 
                        
-            if draft.find('#')!=-1 and draft.find('#')!=0:
-                draft = draft[draft.find('#'):]
+            #if draft.find('#')!=-1 and draft.find('#')!=0:
+            #    draft = draft[draft.find('#'):]
             
             print(f"--> step:{step}")
             print(f"--> {draft}")
