@@ -620,13 +620,77 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-def get_answer_using_opensearch(connectionId, requestId, chat, text):    
-    msg = ""
-    top_k = 4
-    relevant_docs = []
+def get_answer_using_opensearch(connectionId, requestId, chat, text):
+    # retrieval
+    isTyping(connectionId, requestId, "retrieving...")
+    relevant_docs = retrieval_documents(text)
+        
+    # grading
+    isTyping(connectionId, requestId, "grading...")    
+    filtered_docs = grade_documents(text, relevant_docs) # grading    
+    filtered_docs = check_duplication(filtered_docs) # check duplication
+            
+    relevant_context = ""
+    for document in filtered_docs:
+        relevant_context = relevant_context + document.page_content + "\n\n"        
+    # print('relevant_context: ', relevant_context)
+
+    # generating
+    isTyping(connectionId, requestId, "generating...")                  
+    if isKorean(text)==True:
+        system = (
+            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+            "다음의 Reference texts을 이용하여 user의 질문에 답변합니다."
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+            "답변의 이유를 풀어서 명확하게 설명합니다."
+            "결과는 <result> tag를 붙여주세요."
+            "답변은 markdown 포맷을 사용하지 않습니다."
+        )
+    else: 
+        system = (
+            "You will be acting as a thoughtful advisor."
+            "Provide a concise answer to the question at the end using reference texts." 
+            "If you don't know the answer, just say that you don't know, don't try to make up an answer."
+            # "You will only answer in text format, using markdown format is not allowed."
+        )    
+    human = (
+        "Question: {input}"
+
+        "Reference texts: "
+        "{context}"
+    )
     
-    bedrock_embedding = get_embedding()
-       
+    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
+    # print('prompt: ', prompt)
+                       
+    chain = prompt | chat
+    
+    msg = ""    
+    try: 
+        stream = chain.invoke(
+            {
+                "context": relevant_context,
+                "input": text,
+            }
+        )
+        msg = readStreamMsg(connectionId, requestId, stream.content)    
+        print('msg: ', msg)
+        
+    except Exception:
+        err_msg = traceback.format_exc()
+        print('error message: ', err_msg)        
+            
+        sendErrorMessage(connectionId, requestId, err_msg)    
+        raise Exception ("Not able to request to LLM")
+               
+    return msg
+
+def retrieval_documents(query):
+    top_k = 4
+    print("###### retrieval_documents ######")
+
+    # Vector Search
+    bedrock_embedding = get_embedding()       
     vectorstore_opensearch = OpenSearchVectorSearch(
         index_name = index_name,
         is_aoss = False,
@@ -638,33 +702,63 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
         http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
     )  
     
-    isTyping(connectionId, requestId, "retrieving...")
-    print('multi_region: ', multi_region)
-    
-    if multi_region == 'enable':  # parallel processing
-        relevant_documents = get_documents_from_opensearch(vectorstore_opensearch, text, top_k)
+    relevant_docs = []
+    if enableParentDocumentRetrival == 'enable':
+        result = vectorstore_opensearch.similarity_search_with_score(
+            query = query,
+            k = top_k*2,  
+            search_type="script_scoring",
+            pre_filter={"term": {"metadata.doc_level": "child"}}
+        )
+        print('result: ', result)
+                
+        relevant_documents = []
+        docList = []
+        for re in result:
+            if 'parent_doc_id' in re[0].metadata:
+                parent_doc_id = re[0].metadata['parent_doc_id']
+                doc_level = re[0].metadata['doc_level']
+                print(f"doc_level: {doc_level}, parent_doc_id: {parent_doc_id}")
                         
+                if doc_level == 'child':
+                    if parent_doc_id in docList:
+                        print('duplicated!')
+                    else:
+                        relevant_documents.append(re)
+                        docList.append(parent_doc_id)                        
+                        if len(relevant_documents)>=top_k:
+                            break
+                                    
+        # print('relevant_documents: ', relevant_documents)    
+        for i, doc in enumerate(relevant_documents):
+            if len(doc[0].page_content)>=100:
+                text = doc[0].page_content[:100]
+            else:
+                text = doc[0].page_content            
+            print(f"--> vector search doc[{i}]: {text}, metadata:{doc[0].metadata}")
+        
+
         for i, document in enumerate(relevant_documents):
-            print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
-            parent_doc_id = document[0].metadata['parent_doc_id']
-            doc_level = document[0].metadata['doc_level']
-            #print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
-            
-            content, name, url = get_parent_content(parent_doc_id) # use pareant document
-            #print(f"parent_doc_id: {parent_doc_id}, doc_level: {doc_level}, url: {url}, content: {content}")
-            
-            relevant_docs.append(
-                Document(
-                    page_content=content,
-                    metadata={
-                        'name': name,
-                        'url': url,
-                        'doc_level': doc_level,
-                        'from': 'vector'
-                    },
+                print(f'## Document(opensearch-vector) {i+1}: {document}')
+                
+                parent_doc_id = document[0].metadata['parent_doc_id']
+                doc_level = document[0].metadata['doc_level']
+                #print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
+                
+                content, name, url = get_parent_content(parent_doc_id) # use pareant document
+                #print(f"parent_doc_id: {parent_doc_id}, doc_level: {doc_level}, url: {url}, content: {content}")
+                
+                relevant_docs.append(
+                    Document(
+                        page_content=content,
+                        metadata={
+                            'name': name,
+                            'url': url,
+                            'doc_level': doc_level,
+                            'from': 'vector'
+                        },
+                    )
                 )
-            )
     else: 
         relevant_documents = vectorstore_opensearch.similarity_search_with_score(
             query = text,
@@ -688,68 +782,12 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
                 )
             )
     # print('the number of docs (vector search): ', len(relevant_docs))
-            
+
+    # Lexical Search
     if enableHybridSearch == 'true':
         relevant_docs += lexical_search(text, top_k)    
-        
-    isTyping(connectionId, requestId, "grading...")
-    
-    filtered_docs = grade_documents(text, relevant_docs) # grading
-    
-    filtered_docs = check_duplication(filtered_docs) # check duplication
-            
-    relevant_context = ""
-    for i, document in enumerate(filtered_docs):
-        # print(f"{i}: {document}")
-        if document.page_content:
-            content = document.page_content
-            
-        relevant_context = relevant_context + content + "\n\n"
-        
-    # print('relevant_context: ', relevant_context)
 
-    msg = query_using_RAG_context(connectionId, requestId, chat, relevant_context, text)
-               
-    return msg
-
-def get_documents_from_opensearch(vectorstore_opensearch, query, top_k):
-    print("###### get_documents_from_opensearch ######")
-    
-    result = vectorstore_opensearch.similarity_search_with_score(
-        query = query,
-        k = top_k*2,  
-        search_type="script_scoring",
-        pre_filter={"term": {"metadata.doc_level": "child"}}
-    )
-    print('result: ', result)
-            
-    relevant_documents = []
-    docList = []
-    for re in result:
-        if 'parent_doc_id' in re[0].metadata:
-            parent_doc_id = re[0].metadata['parent_doc_id']
-            doc_level = re[0].metadata['doc_level']
-            print(f"doc_level: {doc_level}, parent_doc_id: {parent_doc_id}")
-                    
-            if doc_level == 'child':
-                if parent_doc_id in docList:
-                    print('duplicated!')
-                else:
-                    relevant_documents.append(re)
-                    docList.append(parent_doc_id)
-                    
-                    if len(relevant_documents)>=top_k:
-                        break
-                                
-    # print('relevant_documents: ', relevant_documents)    
-    for i, doc in enumerate(relevant_documents):
-        if len(doc[0].page_content)>=100:
-            text = doc[0].page_content[:100]
-        else:
-            text = doc[0].page_content            
-        print(f"--> vector search doc[{i}]: {text}, metadata:{doc[0].metadata}")
-    
-    return relevant_documents
+    return relevant_docs
 
 def get_parent_content(parent_doc_id):
     response = os_client.get(
@@ -986,7 +1024,7 @@ def search_by_opensearch(keyword: str) -> str:
     
     relevant_docs = [] 
     if enableParentDocumentRetrival == 'true': # parent/child chunking
-        relevant_documents = get_documents_from_opensearch(vectorstore_opensearch, keyword, top_k)
+        relevant_documents = retrieval_documents(vectorstore_opensearch, keyword, top_k)
                         
         for i, document in enumerate(relevant_documents):
             #print(f'## Document(opensearch-vector) {i+1}: {document}')
@@ -1450,75 +1488,6 @@ def get_references(docs):
             reference = reference + f"{i+1}. <a href={url} target=_blank>{name}</a>, {sourceType}, <a href=\"#\" onClick=\"alert(`{excerpt}`)\">관련문서</a>\n"
     return reference
 
-def retrieve(question):
-    # Retrieval
-    bedrock_embedding = get_embedding()
-        
-    vectorstore_opensearch = OpenSearchVectorSearch(
-        index_name = index_name,
-        is_aoss = False,
-        ef_search = 1024, # 512(default)
-        m=48,
-        #engine="faiss",  # default: nmslib
-        embedding_function = bedrock_embedding,
-        opensearch_url=opensearch_url,
-        http_auth=(opensearch_account, opensearch_passwd), # http_auth=awsauth,
-    ) 
-    
-    top_k = 4
-    docs = []    
-    if enableParentDocumentRetrival == 'true':
-        relevant_documents = get_documents_from_opensearch(vectorstore_opensearch, question, top_k)
-
-        for i, document in enumerate(relevant_documents):
-            print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
-            parent_doc_id = document[0].metadata['parent_doc_id']
-            doc_level = document[0].metadata['doc_level']
-            print(f"child: parent_doc_id: {parent_doc_id}, doc_level: {doc_level}")
-                
-            excerpt, name, url = get_parent_content(parent_doc_id) # use pareant document
-            print(f"parent_doc_id: {parent_doc_id}, doc_level: {doc_level}, url: {url}, content: {excerpt}")
-            
-            docs.append(
-                Document(
-                    page_content=excerpt,
-                    metadata={
-                        'name': name,
-                        'url': url,
-                        'doc_level': doc_level,
-                        'from': 'vector'
-                    },
-                )
-            )
-    else: 
-        relevant_documents = vectorstore_opensearch.similarity_search_with_score(
-            query = question,
-            k = top_k,
-        )
-
-        for i, document in enumerate(relevant_documents):
-            print(f'## Document(opensearch-vector) {i+1}: {document}')
-            
-            excerpt = document[0].page_content        
-            url = document[0].metadata['url']
-                            
-            docs.append(
-                Document(
-                    page_content=excerpt,
-                    metadata={
-                        'name': name,
-                        'url': url,
-                        'from': 'vector'
-                    },
-                )
-            )    
-    
-    if enableHybridSearch=='true':
-        docs += lexical_search(question, top_k)
-    
-    return docs
-
 def web_search(question, documents):
     global reference_docs
     
@@ -1958,7 +1927,7 @@ def run_corrective_rag(connectionId, requestId, query):
         print("###### retrieve ######")
         question = state["question"]
         
-        docs = retrieve(question)
+        docs = retrieval_documents(question)
         
         return {"documents": docs, "question": question}
 
@@ -2144,7 +2113,7 @@ def run_self_rag(connectionId, requestId, query):
         
         update_state_message("retrieving...", config)
         
-        docs = retrieve(question)
+        docs = retrieval_documents(question)
         
         return {"documents": docs, "question": question}
     
@@ -2359,7 +2328,7 @@ def run_self_corrective_rag(connectionId, requestId, query):
         
         update_state_message("retrieving...", config)
         
-        docs = retrieve(question)
+        docs = retrieval_documents(question)
         
         return {"documents": docs, "question": question, "web_fallback": True}
 
@@ -2578,11 +2547,6 @@ def run_planning(connectionId, requestId, query):
         
         update_state_message("executing...", config)
         
-        plan_str = "\n".join(f"{i+1}. {step}" for i, step in enumerate(plan))
-        print("plan_str: ", plan_str)
-        
-        print('task: ', plan[0])
- 
         system =  (
             "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
             "답변의 이유를 풀어서 명확하게 설명합니다."
@@ -3808,98 +3772,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
     print('output: ', output)
     
     return output['final_doc']
-            
-####################### Knowledge Base #######################
-# Knowledge Base
-##############################################################
-
-def query_using_RAG_context(connectionId, requestId, chat, context, revised_question):    
-    isTyping(connectionId, requestId, "generating...")  
-                
-    if isKorean(revised_question)==True:
-        system = (
-            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
-            "다음의 Reference texts을 이용하여 user의 질문에 답변합니다."
-            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-            "답변의 이유를 풀어서 명확하게 설명합니다."
-            "결과는 <result> tag를 붙여주세요."
-            "답변은 markdown 포맷을 사용하지 않습니다."
-        )
-    else: 
-        system = (
-            "You will be acting as a thoughtful advisor."
-            "Provide a concise answer to the question at the end using reference texts." 
-            "If you don't know the answer, just say that you don't know, don't try to make up an answer."
-            # "You will only answer in text format, using markdown format is not allowed."
-        )    
-    human = (
-        "Question: {input}"
-
-        "Reference texts: "
-        "{context}"
-    )
-    
-    prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-    # print('prompt: ', prompt)
-                   
-    chain = prompt | chat
-    
-    try: 
-        stream = chain.invoke(
-            {
-                "context": context,
-                "input": revised_question,
-            }
-        )
-        msg = readStreamMsg(connectionId, requestId, stream.content)    
-        print('msg: ', msg)
-        
-    except Exception:
-        err_msg = traceback.format_exc()
-        print('error message: ', err_msg)        
-            
-        sendErrorMessage(connectionId, requestId, err_msg)    
-        raise Exception ("Not able to request to LLM")
-
-    return msg
-
-def get_reference_of_knoweledge_base(docs, path, doc_prefix):
-    reference = "\n\nFrom\n"
-    #print('path: ', path)
-    #print('doc_prefix: ', doc_prefix)
-    #print('prefix: ', f"/{doc_prefix}")
-    
-    for i, document in enumerate(docs):
-        if document.page_content:
-            excerpt = document.page_content
-        
-        score = document.metadata["score"]
-        print('score:', score)
-        doc_prefix = "knowledge-base"
-        
-        link = ""
-        if "s3Location" in document.metadata["location"]:
-            link = document.metadata["location"]["s3Location"]["uri"] if document.metadata["location"]["s3Location"]["uri"] is not None else ""
-            
-            print('link:', link)    
-            pos = link.find(f"/{doc_prefix}")
-            name = link[pos+len(doc_prefix)+1:]
-            encoded_name = parse.quote(name)
-            print('name:', name)
-            link = f"{path}{doc_prefix}{encoded_name}"
-            
-        elif "webLocation" in document.metadata["location"]:
-            link = document.metadata["location"]["webLocation"]["url"] if document.metadata["location"]["webLocation"]["url"] is not None else ""
-            name = "WWW"
-
-        print('link:', link)
                     
-        reference = reference + f"{i+1}. <a href={link} target=_blank>{name}</a>, <a href=\"#\" onClick=\"alert(`{excerpt}`)\">관련문서</a>\n"
-                    
-    return reference
-
-
-        
 #########################################################
 def traslation(chat, text, input_language, output_language):
     system = (
