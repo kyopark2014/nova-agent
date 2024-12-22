@@ -193,6 +193,10 @@ plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 �
 아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 
 ![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
 
+이때 동작시간을 확인하면 아래와 같습니다.
+
+![image](https://github.com/user-attachments/assets/5daa6eb3-7b0c-41d3-9f08-1ee6c974252e)
+
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
