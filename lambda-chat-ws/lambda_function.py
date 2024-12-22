@@ -657,13 +657,13 @@ def generate_answer(chat, relevant_docs, text):
         "context": relevant_context,
         "input": text,
     })
-    print('response.content: ', response.content)
+    # print('response.content: ', response.content)
 
     if response.content.find('<result>') == -1:
         output = response.content
     else:
         output = response.content[response.content.find('<result>')+8:response.content.find('</result>')]        
-    print('output: ', output)
+    # print('output: ', output)
          
     return output
 
@@ -2620,61 +2620,59 @@ def run_planning(connectionId, requestId, query):
         print('state of replan node: ', state)
         
         update_state_message("replanning...", config)
-        
-        replanner_prompt = ChatPromptTemplate.from_template(
-            "For the given objective, come up with a simple step by step plan."
-            "This plan should involve individual tasks, that if executed correctly will yield the correct answer."
-            "Do not add any superfluous steps."
-            "The result of the final step should be the final answer."
-            "Make sure that each step has all the information needed - do not skip steps."
 
-            "Your objective was this:"
-            "{input}"
-
-            "Your original plan was this:"
+        system = (
+            "당신은 복잡한 문제를 해결하기 위해 step by step plan을 생성하는 AI agent입니다."
+            "당신은 다음의 Question에 대한 적절한 답변을 얻고자합니다."
+        )        
+        human = (
+            "Question: {input}"
+                        
+            "당신의 원래 계획은 아래와 같습니다." 
+            "Original Plan:"
             "{plan}"
 
-            "You have currently done the follow steps:"
+            "완료한 단계는 아래와 같습니다."
+            "Past steps:"
             "{past_steps}"
-
-            "Update your plan accordingly."
-            "If no more steps are needed and you can return to the user, then respond with that."
-            "Otherwise, fill out the plan."
-            "Only add steps to the plan that still NEED to be done. Do not return previously done steps as part of the plan."
-        )
+            
+            "당신은 Original Plan의 원래 계획을 상황에 맞게 수정하세요."
+            "계획에 아직 해야 할 단계만 추가하세요. 이전에 완료한 단계는 계획에 포함하지 마세요."                
+            "수정된 계획에는 <plan> tag를 붙여주세요."
+            "만약 더 이상 계획을 세우지 않아도 Question의 주어진 질문에 답변할 있다면, 최종 결과로 Question에 대한 답변을 <result> tag를 붙여 전달합니다."
+            
+            "수정된 계획의 형식은 아래와 같습니다."
+            "각 단계는 반드시 한줄의 문장으로 AI agent가 수행할 내용을 명확히 나타냅니다."
+            "1. [질문을 해결하기 위한 단계]"
+            "2. [질문을 해결하기 위한 단계]"
+            "..."         
+        )                   
+        
+        replanner_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system),
+                ("human", human),
+            ]
+        )     
         
         chat = get_chat()
         replanner = replanner_prompt | chat
         
-        output = replanner.invoke({
+        response = replanner.invoke({
             "input": state["input"],
             "plan": state["plan"],
             "past_steps": state["past_steps"]
         })
-        print('replanner output: ', output.content)
-        
-        result = None
-        for attempt in range(5):
-            chat = get_chat()
-            structured_llm = chat.with_structured_output(Act, include_raw=True)    
-            info = structured_llm.invoke(output.content)
-            print(f'attempt: {attempt}, info: {info}')
-            
-            if not info['parsed'] == None:
-                result = info['parsed']
-                print('replan result: ', result)
-                break
-                    
-        if result == None:
-            return {"response": "답을 찾지 못하였습니다. 다시 시도해주세요."}
+        print('replanner output: ', response.content)
+        result = response.content
+
+        if result.find('<plan>') == -1:
+            return {"response":response.content}
         else:
-            if isinstance(result.action, Response):  # "parsed":"Act(action=Response(response="
-                return {
-                    "response": result.action.response,
-                    "info": [result.action.response]
-                }
-            else:  # "parsed":"Act(action=Plan(steps=
-                return {"plan": result.action.steps}
+            plans = output.strip().replace('\n\n', '\n')
+            planning_steps = plans.split('\n')
+            print('planning_steps: ', planning_steps)
+            return {"plan": planning_steps}
         
     def should_end(state: State) -> Literal["continue", "end"]:
         print('#### should_end ####')
