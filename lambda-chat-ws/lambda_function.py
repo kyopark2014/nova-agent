@@ -620,23 +620,13 @@ def general_conversation(connectionId, requestId, chat, query):
     
     return msg
 
-def get_answer_using_opensearch(connectionId, requestId, chat, text):
-    # retrieval
-    isTyping(connectionId, requestId, "retrieving...")
-    relevant_docs = retrieval_documents(text)
-        
-    # grading
-    isTyping(connectionId, requestId, "grading...")    
-    filtered_docs = grade_documents(text, relevant_docs) # grading    
-    filtered_docs = check_duplication(filtered_docs) # check duplication
-            
+def generate_answer(connectionId, requestId, chat, relevant_docs, text):    
     relevant_context = ""
-    for document in filtered_docs:
+    for document in relevant_docs:
         relevant_context = relevant_context + document.page_content + "\n\n"        
     # print('relevant_context: ', relevant_context)
 
     # generating
-    isTyping(connectionId, requestId, "generating...")                  
     if isKorean(text)==True:
         system = (
             "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
@@ -682,7 +672,23 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
             
         sendErrorMessage(connectionId, requestId, err_msg)    
         raise Exception ("Not able to request to LLM")
-               
+             
+    return msg
+
+def get_answer_using_opensearch(connectionId, requestId, chat, text):
+    # retrieve
+    isTyping(connectionId, requestId, "retrieving...")
+    relevant_docs = retrieval_documents(text)
+        
+    # grade
+    isTyping(connectionId, requestId, "grading...")    
+    filtered_docs = grade_documents(text, relevant_docs) # grading    
+    filtered_docs = check_duplication(filtered_docs) # check duplication
+            
+    # generate
+    isTyping(connectionId, requestId, "generating...")                  
+    msg = generate_answer(connectionId, requestId, chat, relevant_docs, text)
+      
     return msg
 
 def retrieval_documents(query):
@@ -761,7 +767,7 @@ def retrieval_documents(query):
                 )
     else: 
         relevant_documents = vectorstore_opensearch.similarity_search_with_score(
-            query = text,
+            query = query,
             k = top_k
         )
         
@@ -785,7 +791,7 @@ def retrieval_documents(query):
 
     # Lexical Search
     if enableHybridSearch == 'true':
-        relevant_docs += lexical_search(text, top_k)    
+        relevant_docs += lexical_search(query, top_k)    
 
     return relevant_docs
 
