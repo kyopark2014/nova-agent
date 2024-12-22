@@ -193,7 +193,7 @@ plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 �
 
 ### Multi-agent Collaboration
 
-아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 
+아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 7067자(글자만 5446)의 답변이 생성되었습니다.
 ![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
 
 이때 동작시간을 확인하면 아래와 같습니다.
