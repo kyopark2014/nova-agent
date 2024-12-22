@@ -164,6 +164,30 @@ Planing 패턴을 이용하면, CoT(Chain of Thought)형태로 반복적으로 �
 
 ![image](https://github.com/user-attachments/assets/4c0086da-865c-44c3-84fa-64246a10f624)
 
+이때 처음 생성된 plan은 아래와 같습니다.
+
+```text
+planning_steps:
+
+1. LLM Ops의 개념과 중요성을 파악합니다.
+
+2. LLM Ops의 주요 구성 요소와 기능을 설명합니다.
+
+3. LLM Ops의 구현 방법과 도구에 대해 설명합니다.
+
+4. LLM Ops의 장점과 잠재적인 문제점을 분석합니다.
+```
+
+plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 반복하면서 원하는 답변을 찾습니다.
+
+이때의 결과는 아래와 같습니다.
+
+![noname](https://github.com/user-attachments/assets/91457669-bf2a-422d-887a-ddc3ca763fdd)
+
+이를 실행을 보면 아래와 같이 plan / execute / replan의 과정을 통해 답변을 얻었음을 알 수 있습니다.
+
+![noname](https://github.com/user-attachments/assets/8f1e5860-ebf1-402f-880d-28da222197e3)
+
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
