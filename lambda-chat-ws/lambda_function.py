@@ -2651,9 +2651,13 @@ def run_planning(connectionId, requestId, query):
         if result.find('<plan>') == -1:
             return {"response":response.content}
         else:
-            plans = result.strip().replace('\n\n', '\n')
+            output = result[result.find('<plan>')+6:result.find('</plan>')]
+            print('plan output: ', output)
+
+            plans = output.strip().replace('\n\n', '\n')
             planning_steps = plans.split('\n')
             print('planning_steps: ', planning_steps)
+            
             return {"plan": planning_steps}
         
     def should_end(state: State) -> Literal["continue", "end"]:
