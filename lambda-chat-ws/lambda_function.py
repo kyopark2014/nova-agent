@@ -692,6 +692,7 @@ def get_answer_using_opensearch(connectionId, requestId, chat, text):
             "Provide a concise answer to the question at the end using reference texts." 
             "If you don't know the answer, just say that you don't know, don't try to make up an answer."
             "You will only answer in text format, using markdown format is not allowed."
+            "Put it in <result> tags."
         )    
     human = (
         "Question: {input}"
@@ -815,7 +816,6 @@ def retrieve_documents_from_opensearch(query, top_k):
             else:
                 text = doc[0].page_content            
             print(f"--> vector search doc[{i}]: {text}, metadata:{doc[0].metadata}")
-        
 
         for i, document in enumerate(relevant_documents):
                 print(f'## Document(opensearch-vector) {i+1}: {document}')
@@ -3124,7 +3124,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
 
     def retrieve_docs(search_queries, config):
         docs = []
-        top_k = numberOfDocs
         
         idx = config.get("configurable", {}).get("idx")
         parallel_retrieval = config.get("configurable", {}).get("parallel_retrieval")
@@ -3238,9 +3237,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             else:
                 revised_draft = output[output.find('<result>')+8:output.find('</result>')]
                 
-            #if revised_draft.find('#')!=-1 and revised_draft.find('#')!=0:
-            #    revised_draft = revised_draft[revised_draft.find('#'):]
-
             print('--> draft: ', draft)
             print('--> reflection: ', reflection)
             print('--> revised_draft: ', revised_draft)
@@ -3768,7 +3764,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         "recursion_limit": 50,
         "requestId": requestId,
         "connectionId": connectionId,
-        "parallel_revise": "enable" 
+        "parallel_revise": "disable" 
     }
     
     output = app.invoke(inputs, config)
