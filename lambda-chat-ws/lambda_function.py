@@ -3466,8 +3466,12 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             
             print('instruction:', instruction)
             print('planning_steps:', planning_steps)
-            # print('text:', text)
+            print('text:', text)
             print('step:', step)
+
+            regex = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/" # English, Korean, Numbers
+            text = re.compile(regex)
+            print("modified text: ", text)
 
             result = write_chain.invoke({
                 "intruction": instruction,
