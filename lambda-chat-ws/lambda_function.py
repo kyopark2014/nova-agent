@@ -3328,10 +3328,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "당신은 글쓰기 지시 사항을 여러 개의 하위 작업으로 나눌 것입니다."
                 "각 하위 작업은 에세이의 한 단락 작성을 안내할 것이며, 해당 단락의 주요 내용과 단어 수 요구 사항을 포함해야 합니다."
 
-                "글쓰기 지시 사항:"
-                "<instruction>"
+                "글쓰기 지시 사항은 아래와 같습니다."
+                "Instruction:"
                 "{instruction}"
-                "<instruction>"
                 
                 "다음 형식으로 나누어 주시기 바랍니다. 각 하위 작업은 한 줄을 차지합니다:"
                 "1. Main Point: [문단의 주요 내용을 자세히 설명하십시오.], Word Count: [Word count requirement, e.g., 800 words]"
@@ -3390,22 +3389,26 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         planning_steps = state["planning_steps"]
         print('instruction: ', instruction)
         print('planning_steps: ', planning_steps)
+
+        for idx, step in enumerate(planning_steps):         
+            print(f"{idx}: {step}")
         
         update_state_message("executing...", config)
         
         if isKorean(instruction):
             system = {
                 "당신은 훌륭한 글쓰기 도우미입니다." 
-                "아래와 같이 글쓰기 지시사항인 Instruction과 계획한 글쓰기 단계인 plan을 제공하였습니다."
-                "또한 기작성한 텍스트은 Written text로 제공합니다."
-                "글쓰기 지시 사항, 글쓰기 단계, 이미 작성된 텍스트를 참조하여 다음 단계을 계속 작성합니다."
+                "글쓰기 plan에 따라 instruction에 대한 글을 작성하고자 합니다."
+                "이전 단계에서 written text까지 작성하였고, next step을 계속 작성합니다."
+                #"글쓰기 지시 사항, 글쓰기 단계, 이미 작성된 텍스트를 참조하여 Next step을 계속 작성합니다."
+                #
                 "글이 끊어지지 않고 잘 이해되도록 하나의 문단을 충분히 길게 작성합니다."
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
                 "이미 작성된 텍스트를 반복하지 말고 작성한 문단만 출력하세요."                
                 #"Markdown 포맷으로 서식을 작성하세요."                
             }
             human = (
-                "아래는 이미 작성된 텍스트입니다."
+                "아래는 이전 단계에서 작성된 텍스트입니다."
                 "Written text:"
                 "{text}"
 
@@ -3417,7 +3420,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "Plan:"
                 "{plan}"
                
-                "다음으로 작성할 글쓰기 단계는 아래입니다."
+                "다음으로 작성할 글쓰기 단계입니다. Instruction, plan, written text을 참조하여 next step을 계속 작성합니다."
                 "Next step:"
                 "{step}"
             )
