@@ -1683,7 +1683,8 @@ def init_enhanced_search():
         print('messages: ', messages)
 
         last_message = messages[-1]
-        if "content" in last_message:  
+        print('last_message: ', last_message)
+        if isinstance(last_message, ToolMessage):    
             if last_message.content == "":
                 print('last_message.content is empty')                
                 return {"messages": [AIMessage(content="")]}
