@@ -266,10 +266,12 @@ MSG_LENGTH = 100
 def get_chat():
     global selected_chat
     
-    if multi_region == 'enable':
+    if multi_region == 'enable':        
         profile = multi_region_models[selected_chat]
+        length_of_models = len(multi_region_models)
     else:
         profile = LLM_for_chat[selected_chat]
+        length_of_models = 1
         
     bedrock_region =  profile['bedrock_region']
     modelId = profile['model_id']
