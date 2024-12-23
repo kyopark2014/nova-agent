@@ -161,6 +161,17 @@ search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연�
 
 ![noname](https://github.com/user-attachments/assets/5c81d318-34eb-4948-ab22-42c8502b750f)
 
+
+이번에는 "Amazon에서 SA로 일하는것"라고 입력하고 결과를 확인합니다.
+
+![noname](https://github.com/user-attachments/assets/f3bc351e-acb6-462e-a86b-9a33449b6013)
+
+
+이때의 동작을 LangSmith로 확인합니다. 여기에서는 3번의 검색을 통해, 초안(draft)를 생성한 후에 3회 추가 검색을 통해 초안의 답변을 향상시켰습니다.
+
+![noname](https://github.com/user-attachments/assets/426e7a43-2f0a-4eb1-a5f7-14148dab74f4)
+
+
 ### Planning
 
 Planing 패턴을 이용하면, CoT(Chain of Thought)형태로 반복적으로 결과를 개선함으로써 향상된 결과를 얻을 수 있습니다. 
