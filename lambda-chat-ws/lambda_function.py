@@ -1871,7 +1871,7 @@ def run_agent_executor2(connectionId, requestId, query):
 
         if answer.find('<thinking>') != -1:
             print('Remove <thinking> tag.')
-            answer = answer[answer.find('</thinking>')+13:]
+            answer = answer[answer.find('</thinking>')+12:]
         print('answer: ', answer)
         
         return {
