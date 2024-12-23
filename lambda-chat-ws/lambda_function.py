@@ -1676,12 +1676,19 @@ def init_enhanced_search():
             return "continue"
 
     def call_model(state: State, config):
-        question = state["messages"]
-        print('question: ', question)
-        
+        print('##### call_model #####')
         update_state_message("thinking...", config)
-            
-        if isKorean(question[0].content)==True:
+
+        messages = state["messages"]
+        print('messages: ', messages)
+
+        last_message = messages[-1]
+        if "content" in last_message:  
+            if last_message.content == "":
+                print('last_message.content is empty')                
+                return {"messages": [AIMessage(content="")]}
+                
+        if isKorean(messages[0].content)==True:
             system = (
                 "당신은 질문에 답변하기 위한 정보를 수집하는 연구원입니다."
                 "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
@@ -1704,7 +1711,7 @@ def init_enhanced_search():
         )
         chain = prompt | model
                 
-        response = chain.invoke(question)
+        response = chain.invoke(messages)
         print('call_model response: ', response.tool_calls)
         
         # state messag
