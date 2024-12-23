@@ -3105,7 +3105,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             update_state_message(f"reflecting... (grader-{idx})", config)        
             fitered_docs = grade_documents(q, docs)
             
-            print(f'retrieve {idx}: len(WEB_relevant_docs)=', len(relevant_docs))
+            print(f'retrieving... {idx}: len(WEB_relevant_docs)=', len(relevant_docs))
             relevant_docs += fitered_docs
                     
         conn.send(relevant_docs)
@@ -3153,21 +3153,21 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             for q in search_queries:        
                 # RAG - knowledge base
                 #if rag_state=='enable':
-                #    update_state_message(f"reflecting... (RAG_retriever-{idx})", config)
+                #    update_state_message(f"retrieving... (RAG_retriever-{idx})", config)
                 #    docs = retrieve_from_knowledge_base(q, top_k)
                 #    print(f'q: {q}, RAG: {docs}')
                             
                 #    if len(docs):
-                #        update_state_message(f"reflecting... (grader-{idx})", config)        
+                #        update_state_message(f"retrieving... (grader-{idx})", config)        
                 #        relevant_docs += grade_documents(q, docs)
             
                 # web search
-                update_state_message(f"reflecting... (WEB_retriever-{idx})", config)
+                update_state_message(f"retrieving... (WEB_retriever-{idx})", config)
                 docs = tavily_search(q, top_k)
                 print(f'q: {q}, WEB: {docs}')
                 
                 if len(docs):
-                    update_state_message(f"reflecting... (grader-{idx})", config)        
+                    update_state_message(f"retrieving... (grader-{idx})", config)        
                     relevant_docs += grade_documents(q, docs)
                     
         for i, doc in enumerate(relevant_docs):
@@ -3204,73 +3204,76 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         if len(filtered_docs):
             for d in filtered_docs:
                 content.append(d.page_content)            
-        print('content: ', content)
+            print('content: ', content)
         
-        update_state_message(f"revising... (generate-{idx})", config)
-        
-        if isKorean(draft):
-            system = (
-                "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
-                "draft을 critique과 information 사용하여 수정하십시오."
-                "최종 결과는 한국어로 작성하고 <result> tag를 붙여주세요."
-            )
-            human = (
-                "draft:"
-                "{draft}"
-                            
-                "critique:"
-                "{reflection}"
-
-                "information:"
-                "{content}"
-            )
-        else:    
-            system = (
-                "You are an excellent writing assistant." 
-                "Revise this draft using the critique and additional information."
-                "Provide the final answer with <result> tag."
-            )
-            human = (                            
-                "draft:"
-                "{draft}"
-                            
-                "critique:"
-                "{reflection}"
-
-                "information:"
-                "{content}"
-            )
-                    
-        revise_prompt = ChatPromptTemplate([
-            ('system', system),
-            ('human', human)
-        ])
-
-        chat = get_chat()
-        reflect = revise_prompt | chat
-           
-        res = reflect.invoke(
-            {
-                "draft": draft,
-                "reflection": reflection,
-                "content": content
-            }
-        )
-        output = res.content
-        # print('output: ', output)
-        
-        if output.find('<result>') == -1:
-            revised_draft = output
-        else:
-            revised_draft = output[output.find('<result>')+8:output.find('</result>')]
+            update_state_message(f"revising... (generate-{idx})", config)
             
-        #if revised_draft.find('#')!=-1 and revised_draft.find('#')!=0:
-        #    revised_draft = revised_draft[revised_draft.find('#'):]
+            if isKorean(draft):
+                system = (
+                    "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
+                    "draft을 critique과 information 사용하여 수정하십시오."
+                    "최종 결과는 한국어로 작성하고 <result> tag를 붙여주세요."
+                )
+                human = (
+                    "draft:"
+                    "{draft}"
+                                
+                    "critique:"
+                    "{reflection}"
 
-        print('--> draft: ', draft)
-        print('--> reflection: ', reflection)
-        print('--> revised_draft: ', revised_draft)
-        
+                    "information:"
+                    "{content}"
+                )
+            else:    
+                system = (
+                    "You are an excellent writing assistant." 
+                    "Revise this draft using the critique and additional information."
+                    "Provide the final answer with <result> tag."
+                )
+                human = (                            
+                    "draft:"
+                    "{draft}"
+                                
+                    "critique:"
+                    "{reflection}"
+
+                    "information:"
+                    "{content}"
+                )
+                        
+            revise_prompt = ChatPromptTemplate([
+                ('system', system),
+                ('human', human)
+            ])
+
+            chat = get_chat()
+            reflect = revise_prompt | chat
+            
+            res = reflect.invoke(
+                {
+                    "draft": draft,
+                    "reflection": reflection,
+                    "content": content
+                }
+            )
+            output = res.content
+            # print('output: ', output)
+            
+            if output.find('<result>') == -1:
+                revised_draft = output
+            else:
+                revised_draft = output[output.find('<result>')+8:output.find('</result>')]
+                
+            #if revised_draft.find('#')!=-1 and revised_draft.find('#')!=0:
+            #    revised_draft = revised_draft[revised_draft.find('#'):]
+
+            print('--> draft: ', draft)
+            print('--> reflection: ', reflection)
+            print('--> revised_draft: ', revised_draft)
+        else:
+            print('No reflection!')
+            revised_draft = draft
+            
         revision_number = state["revision_number"] if state.get("revision_number") is not None else 1
         
         return {
