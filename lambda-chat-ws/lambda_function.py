@@ -3469,9 +3469,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             print('text:', text)
             print('step:', step)
 
-            regex = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/" # English, Korean, Numbers
+            regex = '/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/' # English, Korean, Numbers
             p = re.compile(regex)
-            text2 = p.match(text)
+            m = p.search(text)
+            text2 = m.group(0)
             print("modified text: ", text2)
 
             result = write_chain.invoke({
