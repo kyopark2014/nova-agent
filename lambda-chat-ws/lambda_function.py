@@ -1769,24 +1769,19 @@ def run_agent_executor2(connectionId, requestId, query):
 
     tool_node = ToolNode(tools)
             
-    def create_agent(chat, tools, system_message: str):        
+    def create_agent(chat, tools):        
         tool_names = ", ".join([tool.name for tool in tools])
         print("tool_names: ", tool_names)
-        
+
         system = (
             "당신의 이름은 서연이고, 질문에 친근한 방식으로 대답하도록 설계된 대화형 AI입니다."
             "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
             "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-            "최종 답변에는 조사한 내용을 반드시 포함합니다."
-            #"최종 답변에는 조사한 내용을 반드시 포함하여야 하고, <result> tag를 붙여주세요."
-            "You are a helpful AI assistant, collaborating with other assistants."
+
             "Use the provided tools to progress towards answering the question."
             "If you are unable to fully answer, that's OK, another assistant with different tools "
             "will help where you left off. Execute what you can to make progress."
-            #"If you or any of the other assistants have the final answer or deliverable,"
-            #"prefix your response with FINAL ANSWER so the team knows to stop."
             "You have access to the following tools: {tool_names}."
-            "{system_message}"
         )
 
         prompt = ChatPromptTemplate.from_messages(
@@ -1796,7 +1791,6 @@ def run_agent_executor2(connectionId, requestId, query):
             ]
         )
         
-        prompt = prompt.partial(system_message=system_message)
         prompt = prompt.partial(tool_names=tool_names)
         
         return prompt | chat.bind_tools(tools)
@@ -1806,9 +1800,36 @@ def run_agent_executor2(connectionId, requestId, query):
         print('last_message: ', state["messages"][-1])
 
         if state["messages"][-1].content == "":
-            print("No content in the message!")
+            print("No content from RAG!")
+
+            if isKorean(state["messages"][0].content)==True:
+                system = (
+                    "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+                    "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
+                    "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+                    #"답변은 markdown 포맷(예: ##)을 사용하지 않습니다."
+                )
+            else: 
+                system = (
+                    "You will be acting as a thoughtful advisor."
+                    "Using the following conversation, answer friendly for the newest question." 
+                    "If you don't know the answer, just say that you don't know, don't try to make up an answer."     
+                    #"Do not use markdown format."
+                )
+            
+            human = "Question: {input}"
+            
+            prompt = ChatPromptTemplate.from_messages([
+                ("system", system), 
+                ("human", human)
+            ])
+            
+            chain = prompt | chat    
+            output = chain.invoke({"input": query})
+            print('output.content: ', output.content)
+
             return {
-                "messages": [AIMessage(content="")],
+                "messages": [AIMessage(content=output.content)],
             }
         
         response = agent.invoke(state["messages"])
@@ -1855,8 +1876,8 @@ def run_agent_executor2(connectionId, requestId, query):
         }
     
     chat = get_chat()
-    system_message = "You should provide accurate data for the questione."
-    execution_agent = create_agent(chat, tools, system_message)
+    
+    execution_agent = create_agent(chat, tools)
     
     execution_agent_node = functools.partial(agent_node, agent=execution_agent, name="execution_agent")
     
