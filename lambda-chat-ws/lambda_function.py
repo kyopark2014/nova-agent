@@ -1680,15 +1680,16 @@ def init_enhanced_search():
         update_state_message("thinking...", config)
 
         messages = state["messages"]
-        print('messages: ', messages)
+        # print('messages: ', messages)
 
         last_message = messages[-1]
         print('last_message: ', last_message)
-        if isinstance(last_message, ToolMessage):    
-            if last_message.content == "":
-                print('last_message.content is empty')                
-                return {"messages": [AIMessage(content="")]}
-                
+        if isinstance(last_message, ToolMessage) and last_message.content=="":  
+            print('last_message is empty')      
+            print('question: ', state["messages"][0].content)
+            answer = get_basic_answer(state["messages"][0].content)          
+            return {"messages": [AIMessage(content=answer)]}
+            
         if isKorean(messages[0].content)==True:
             system = (
                 "당신은 질문에 답변하기 위한 정보를 수집하는 연구원입니다."
@@ -1805,38 +1806,15 @@ def run_agent_executor2(connectionId, requestId, query):
     
     def agent_node(state, agent, name):
         print(f"###### agent_node:{name} ######")
-        print('last_message: ', state["messages"][-1])
 
-        if state["messages"][-1].content == "":
-            print("No content from RAG!")
-
-            if isKorean(state["messages"][0].content)==True:
-                system = (
-                    "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
-                    "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
-                    "모르는 질문을 받으면 솔직히 모른다고 말합니다."
-                )
-            else: 
-                system = (
-                    "You will be acting as a thoughtful advisor."
-                    "Using the following conversation, answer friendly for the newest question." 
-                    "If you don't know the answer, just say that you don't know, don't try to make up an answer."     
-                )
-            
-            human = "Question: {input}"
-            
-            prompt = ChatPromptTemplate.from_messages([
-                ("system", system), 
-                ("human", human)
-            ])
-            
-            chain = prompt | chat    
-            output = chain.invoke({"input": query})
-            print('output.content: ', output.content)
-
+        last_message = state["messages"][-1]
+        print('last_message: ', last_message)
+        if isinstance(last_message, ToolMessage) and last_message.content=="":    
+            print('last_message is empty') 
+            answer = get_basic_answer(state["messages"][0].content)  
             return {
-                "messages": [AIMessage(content=output.content)],
-                "answer": output.content
+                "messages": [AIMessage(content=answer)],
+                "answer": answer
             }
         
         response = agent.invoke(state["messages"])
@@ -3806,6 +3784,36 @@ def run_long_form_writing_agent(connectionId, requestId, query):
     return output['final_doc']
                     
 #########################################################
+
+def get_basic_answer(query):
+    print('#### get_basic_answer ####')
+    chat = get_chat()
+
+    if isKorean(query)==True:
+        system = (
+            "당신의 이름은 서연이고, 질문에 대해 친절하게 답변하는 사려깊은 인공지능 도우미입니다."
+            "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다." 
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+        )
+    else: 
+        system = (
+            "You will be acting as a thoughtful advisor."
+            "Using the following conversation, answer friendly for the newest question." 
+            "If you don't know the answer, just say that you don't know, don't try to make up an answer."     
+        )    
+    
+    human = "Question: {input}"    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", system), 
+        ("human", human)
+    ])    
+    
+    chain = prompt | chat    
+    output = chain.invoke({"input": query})
+    print('output.content: ', output.content)
+
+    return output.content
+
 def traslation(chat, text, input_language, output_language):
     system = (
         "You are a helpful assistant that translates {input_language} to {output_language} in <article> tags." 
