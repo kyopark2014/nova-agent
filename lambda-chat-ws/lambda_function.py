@@ -2911,8 +2911,14 @@ def run_knowledge_guru(connectionId, requestId, query):
                 "content": content
             }
         )    
-                                
-        response = HumanMessage(content=res.content[res.content.find('<result>')+8:len(res.content)-9])
+        output = res.content
+
+        if output.find('<result>')==-1:
+            answer = output
+        else:
+            answer = output[output.find('<result>')+8:output.find('</result>')]
+
+        response = HumanMessage(content=answer)
         print('revised_answer: ', response.content)
                 
         revision_number = state["revision_number"] if state.get("revision_number") is not None else 1
@@ -3136,8 +3142,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         top_k = numberOfDocs
         
         idx = config.get("configurable", {}).get("idx")
+        parallel_processing = config.get("configurable", {}).get("parallel_processing")
+        print('parallel_processing: ', parallel_processing)
         
-        if multi_region == 'enable':
+        if parallel_processing == 'enable':
             relevant_docs = parallel_retriever(search_queries, config)        
         else:
             for q in search_queries:        
@@ -3199,45 +3207,41 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         update_state_message(f"revising... (generate-{idx})", config)
         
         if isKorean(draft):
-            revise_template = (
+            system = (
                 "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
                 "draft을 critique과 information 사용하여 수정하십시오."
                 "최종 결과는 한국어로 작성하고 <result> tag를 붙여주세요."
-                            
-                "<draft>"
+            )
+            human = (
+                "draft:"
                 "{draft}"
-                "</draft>"
                             
-                "<critique>"
+                "critique:"
                 "{reflection}"
-                "</critique>"
 
-                "<information>"
+                "information:"
                 "{content}"
-                "</information>"
             )
         else:    
-            revise_template = (
+            system = (
                 "You are an excellent writing assistant." 
                 "Revise this draft using the critique and additional information."
-                # "Provide the final answer using Korean with <result> tag."
                 "Provide the final answer with <result> tag."
-                            
-                "<draft>"
+            )
+            human = (                            
+                "draft:"
                 "{draft}"
-                "</draft>"
                             
-                "<critique>"
+                "critique:"
                 "{reflection}"
-                "</critique>"
 
-                "<information>"
+                "information:"
                 "{content}"
-                "</information>"
             )
                     
         revise_prompt = ChatPromptTemplate([
-            ('human', revise_template)
+            ('system', system),
+            ('human', human)
         ])
 
         chat = get_chat()
@@ -3253,11 +3257,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         output = res.content
         # print('output: ', output)
         
-        revised_draft = output[output.find('<result>')+8:len(output)-9]
-        # print('revised_draft: ', revised_draft) 
+        if output.find('<result>') == -1:
+            revised_draft = output
+        else:
+            revised_draft = output[output.find('<result>')+8:output.find('</result>')]
             
-        if revised_draft.find('#')!=-1 and revised_draft.find('#')!=0:
-            revised_draft = revised_draft[revised_draft.find('#'):]
+        #if revised_draft.find('#')!=-1 and revised_draft.find('#')!=0:
+        #    revised_draft = revised_draft[revised_draft.find('#'):]
 
         print('--> draft: ', draft)
         print('--> reflection: ', reflection)
@@ -3662,9 +3668,12 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('drafts: ', drafts)
         
         update_state_message("revising...", config)
+
+        parallel_processing = config.get("configurable", {}).get("parallel_processing", "")
+        print('parallel_processing: ', parallel_processing)
         
         # reflection
-        if multi_region == 'enable':  # parallel processing
+        if parallel_processing == 'enable':  # parallel processing
             final_doc, references = reflect_drafts_using_parallel_processing(drafts, config)
         else:
             reflection_app = buildReflection()
@@ -3686,7 +3695,8 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     "max_revisions": MAX_REVISIONS,
                     "requestId":requestId,
                     "connectionId": connectionId,
-                    "idx": idx
+                    "idx": idx,
+                    "parallel_processing": "disable"  # no parallel since unsufficient resources
                 }
                 output = reflection_app.invoke(inputs, config=app_config)
                 final_doc += output['revised_draft'] + '\n\n'
