@@ -3473,11 +3473,11 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             print('planning_steps:', planning_steps)            
             print('text:', text)
             
-            regex = '/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/' # English, Korean, Numbers
-            p = re.compile(regex)
-            m = p.search(text)
-            text2 = m.group(0)
-            print("modified text: ", text2)
+            # regex = '/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/' # English, Korean, Numbers
+            # p = re.compile(regex)
+            # m = p.search(text)
+            # text2 = m.group(0)
+            # print("modified text: ", text2)
 
             # Invoke the write_chain
             chat = get_chat()
