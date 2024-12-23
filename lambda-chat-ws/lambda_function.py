@@ -3385,16 +3385,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         
     def execute_node(state: State, config):
         print("###### execute_node ######")        
-        instruction = state["instruction"]
-        planning_steps = state["planning_steps"]
-        print('instruction: ', instruction)
-        print('planning_steps: ', planning_steps)
-
-        for idx, step in enumerate(planning_steps):         
-            print(f"{idx}: {step}")
         
         update_state_message("executing...", config)
         
+        instruction = state["instruction"]        
         if isKorean(instruction):
             system = (
                 "당신은 훌륭한 글쓰기 도우미입니다." 
@@ -3425,12 +3419,14 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "{step}"
             )
         else:    
-            human = (
+            system = (
                 "You are an excellent writing assistant." 
                 "I will give you an original writing instruction and my planned writing steps."
                 "I will also provide you with the text I have already written."
                 "Please help me continue writing the next paragraph based on the writing instruction, writing steps, and the already written text."
-
+            )
+            human = (
+                
                 "Instruction:"
                 "{intruction}"
 
@@ -3443,14 +3439,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "Written text:"
                 "{text}"
                 
-                "Please integrate the original writing instruction, writing steps, and the already written text, and now continue writing {STEP}."
+                "Please integrate the original writing instruction, writing steps, and the already written text, and now continue writing {step}."
                 "If needed, you can add a small subtitle at the beginning."
-                "Remember to only output the paragraph you write, without repeating the already written text."
-                
-                "Use markdown syntax to format your output:"
-                "- Headings: # for main, ## for sections, ### for subsections, etc."
-                "- Lists: * or - for bulleted, 1. 2. 3. for numbered"
-                "- Do not repeat yourself"
+                "Remember to only output the paragraph you write, without repeating the already written text."                
             )
 
         write_prompt = ChatPromptTemplate([
@@ -3458,6 +3449,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             ('human', human)
         ])
         
+        planning_steps = state["planning_steps"]        
         if len(planning_steps) > 50:
             print("plan is too long")
             # print(plan)
@@ -3468,21 +3460,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         for idx, step in enumerate(planning_steps):            
             update_state_message(f"executing... (step: {idx+1}/{len(planning_steps)})", config)
 
-            print('step:', step)
-            print('instruction:', instruction)
-            print('planning_steps:', planning_steps)            
-            print('text:', text)
-            
-            # regex = '/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/' # English, Korean, Numbers
-            # p = re.compile(regex)
-            # m = p.search(text)
-            # text2 = m.group(0)
-            # print("modified text: ", text2)
-
             # Invoke the write_chain
             chat = get_chat()
             write_chain = write_prompt | chat     
-
 
             plan = ""
             for p in planning_steps:
@@ -3506,8 +3486,8 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             #if draft.find('#')!=-1 and draft.find('#')!=0:
             #    draft = draft[draft.find('#'):]
             
-            print(f"--> step:{step}")
-            print(f"--> {draft}")
+            print(f"--> step: {step}")
+            print(f"--> draft: {draft}")
                 
             drafts.append(draft)
             text += draft + '\n\n'
