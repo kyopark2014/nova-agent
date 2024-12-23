@@ -3396,7 +3396,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         update_state_message("executing...", config)
         
         if isKorean(instruction):
-            system = {
+            system = (
                 "당신은 훌륭한 글쓰기 도우미입니다." 
                 "글쓰기 plan에 따라 instruction에 대한 글을 작성하고자 합니다."
                 "이전 단계에서 written text까지 작성하였고, next step을 계속 작성합니다."
@@ -3406,7 +3406,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
                 "이미 작성된 텍스트를 반복하지 말고 작성한 문단만 출력하세요."                
                 #"Markdown 포맷으로 서식을 작성하세요."                
-            }
+            )
             human = (
                 "아래는 이전 단계에서 작성된 텍스트입니다."
                 "Written text:"
