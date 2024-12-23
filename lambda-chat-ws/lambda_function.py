@@ -1107,6 +1107,7 @@ def search_by_opensearch(keyword: str) -> str:
 
     if len(relevant_docs) == 0:
         relevant_context = "No relevant documents found."
+        print('relevant_context: ', relevant_context)
         
     return relevant_context
 
@@ -1802,7 +1803,13 @@ def run_agent_executor2(connectionId, requestId, query):
     
     def agent_node(state, agent, name):
         print(f"###### agent_node:{name} ######")
-        print('state: ', state["messages"])
+        print('last_message: ', state["messages"][-1])
+
+        if state["messages"][-1].content == "":
+            print("No content in the message!")
+            return {
+                "messages": [AIMessage(content="")],
+            }
         
         response = agent.invoke(state["messages"])
         print('response: ', response)
