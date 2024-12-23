@@ -3324,7 +3324,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         if isKorean(instruction):
             system = (
                 "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."
-                #"이번 글쓰기는 20,000 단어 이상의 장편을 목표로 합니다."
                 "당신은 글쓰기 지시 사항을 여러 개의 하위 작업으로 나눌 것입니다."
                 "글쓰기 계획은 5단계 이하로 작성합니다."
                 "각 하위 작업은 에세이의 한 단락 작성을 안내할 것이며, 해당 단락의 주요 내용과 단어 수 요구 사항을 포함해야 합니다."
@@ -3345,7 +3344,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         else:
             system = (
                 "You are a helpful assistant highly skilled in long-form writing."
-                #"This writing aims for a novel of over 20,000 words."
                 "You will break down the writing instruction into multiple subtasks."
                 "Writing plans are created in five steps or less."
                 "Each subtask will guide the writing of one paragraph in the essay, and should include the main points and word count requirements for that paragraph."
@@ -3395,14 +3393,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         if isKorean(instruction):
             system = (
                 "당신은 훌륭한 글쓰기 도우미입니다." 
-                "글쓰기 plan에 따라 instruction에 대한 글을 작성하고자 합니다."
+                "당신은 글쓰기 plan에 따라 instruction에 대한 글을 작성하고자 합니다."
                 "이전 단계에서 written text까지 작성하였고, next step을 계속 작성합니다."
-                #"글쓰기 지시 사항, 글쓰기 단계, 이미 작성된 텍스트를 참조하여 Next step을 계속 작성합니다."
-                #
                 "글이 끊어지지 않고 잘 이해되도록 하나의 문단을 충분히 길게 작성합니다."
+                
                 "필요하다면 앞에 작은 부제를 추가할 수 있습니다."
                 "이미 작성된 텍스트를 반복하지 말고 작성한 문단만 출력하세요."                
-                #"Markdown 포맷으로 서식을 작성하세요."                
+                "Markdown 포맷으로 서식을 작성하세요."                
             )
             human = (
                 "아래는 이전 단계에서 작성된 텍스트입니다."
@@ -3424,27 +3421,34 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         else:    
             system = (
                 "You are an excellent writing assistant." 
-                "I will give you an original writing instruction and my planned writing steps."
-                "I will also provide you with the text I have already written."
+                "You intend to write an article about instructions according to a writing plan. "
+                "In the previous step, we wrote up to the written text, and we will continue writing the next step. "
                 "Please help me continue writing the next paragraph based on the writing instruction, writing steps, and the already written text."
+
+                "If needed, you can add a small subtitle at the beginning."
+                "Remember to only output the paragraph you write, without repeating the already written text."
+                "Use markdown syntax to format your output:"
+                "- Headings: # for main, ## for sections, ### for subsections, etc."
+                "- Lists: * or - for bulleted, 1. 2. 3. for numbered"
+                "- Do not repeat yourself"
+                "Provide the final answer with <result> tag."
             )
             human = (
-                
+                "The text written in the previous step is as follows."
+                "Written text:"
+                "{text}"  
+
+                "The writing instructions are as follows."
                 "Instruction:"
                 "{intruction}"
 
+                "The entire writing plan is as follows."
                 "Plan:"
                 "{plan}"
 
+                "The next step to write is as follows. Please refer to the writing instruction, writing steps, and the already written text."
                 "Next step:"
-                "{step}"
-
-                "Written text:"
-                "{text}"
-                
-                "Please integrate the original writing instruction, writing steps, and the already written text, and now continue writing {step}."
-                "If needed, you can add a small subtitle at the beginning."
-                "Remember to only output the paragraph you write, without repeating the already written text."                
+                "{step}"                                          
             )
 
         write_prompt = ChatPromptTemplate([
@@ -3478,17 +3482,13 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "step": step
             })
             output = result.content
-            print('output: ', output)
+            # print('output: ', output)
             
             if output.find('<result>')==-1:
                 draft = output
             else:
                 draft = output[output.find('<result>')+8:output.find('</result>')]
-            print('draft: ', draft) 
-                       
-            #if draft.find('#')!=-1 and draft.find('#')!=0:
-            #    draft = draft[draft.find('#'):]
-            
+                                  
             print(f"--> step: {step}")
             print(f"--> draft: {draft}")
                 
