@@ -3079,36 +3079,19 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         }
 
     def retrieve_for_writing(conn, q, config):
-        top_k = numberOfDocs
-        
-        relevant_docs = []
-        # RAG - knowledge base
-        #if rag_state=='enable':
-        #    update_state_message(f"reflecting... (RAG_retriever-{idx})", config)
-        #    docs = retrieve_from_knowledge_base(q, top_k)
-        #    print(f'q: {q}, RAG: {docs}')
-                            
-        #    if len(docs):
-        #        update_state_message(f"reflecting... (grader-{idx})", config)        
-        #        fitered_docs = grade_documents(q, docs)
-                
-        #        print(f'retrieve {idx}: len(RAG_relevant_docs)=', len(relevant_docs))
-        #        relevant_docs += fitered_docs
-            
-        # web search
         idx = config.get("configurable", {}).get("idx") 
-        update_state_message(f"reflecting... (WEB_retriever-{idx})", config)    
-        docs = tavily_search(q, top_k)
-        print(f'q: {q}, WEB: {docs}')
-                
-        if len(docs):
-            update_state_message(f"reflecting... (grader-{idx})", config)        
-            fitered_docs = grade_documents(q, docs)
+         
+        update_state_message(f"retrieving... (opensearch-{idx})", config)  
+        relevant_docs = retrieve_documents_from_opensearch(q, top_k=numberOfDocs)
+        update_state_message(f"retrieving... (web-{idx})", config)          
+        relevant_docs += retrieve_documents_from_tavily(q, top_k=numberOfDocs)
             
-            print(f'retrieving... {idx}: len(WEB_relevant_docs)=', len(relevant_docs))
-            relevant_docs += fitered_docs
-                    
-        conn.send(relevant_docs)
+        # grade
+        update_state_message(f"reflecting... (grader-{idx})", config)      
+        filtered_docs = grade_documents(q, relevant_docs) # grading    
+        filtered_docs = check_duplication(filtered_docs) # check duplication
+                                
+        conn.send(filtered_docs)
         conn.close()
 
     def parallel_retriever(search_queries, config):
@@ -3140,7 +3123,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         return relevant_documents
 
     def retrieve_docs(search_queries, config):
-        relevant_docs = []
+        docs = []
         top_k = numberOfDocs
         
         idx = config.get("configurable", {}).get("idx")
@@ -3148,32 +3131,23 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('parallel_retrieval: ', parallel_retrieval)
         
         if parallel_retrieval == 'enable':
-            relevant_docs = parallel_retriever(search_queries, config)        
+            docs = parallel_retriever(search_queries, config)
         else:
             for q in search_queries:        
-                # RAG - knowledge base
-                #if rag_state=='enable':
-                #    update_state_message(f"retrieving... (RAG_retriever-{idx})", config)
-                #    docs = retrieve_from_knowledge_base(q, top_k)
-                #    print(f'q: {q}, RAG: {docs}')
-                            
-                #    if len(docs):
-                #        update_state_message(f"retrieving... (grader-{idx})", config)        
-                #        relevant_docs += grade_documents(q, docs)
+                update_state_message(f"retrieving... (opensearch-{idx})", config)  
+                relevant_docs = retrieve_documents_from_opensearch(q, top_k=numberOfDocs)
+                update_state_message(f"retrieving... (web-{idx})", config)  
+                relevant_docs += retrieve_documents_from_tavily(q, top_k=numberOfDocs)
             
-                # web search
-                update_state_message(f"retrieving... (WEB_retriever-{idx})", config)
-                docs = tavily_search(q, top_k)
-                print(f'q: {q}, WEB: {docs}')
-                
-                if len(docs):
-                    update_state_message(f"retrieving... (grader-{idx})", config)        
-                    relevant_docs += grade_documents(q, docs)
+                # grade
+                update_state_message(f"reflecting... (grader-{idx})", config)
+                docs = grade_documents(q, relevant_docs) # grading
+                docs = check_duplication(docs) # check duplication
                     
-        for i, doc in enumerate(relevant_docs):
+        for i, doc in enumerate(docs):
             print(f"#### {i}: {doc.page_content[:100]}")
         
-        return relevant_docs
+        return docs
         
     def revise_draft(state: ReflectionState, config):   
         print("###### revise_draft ######")
@@ -3190,19 +3164,19 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('revise_draft idx: ', idx)
         update_state_message(f"revising... (retrieve-{idx})", config)
         
-        filtered_docs = retrieve_docs(search_queries, config)        
-        print('filtered_docs: ', filtered_docs)
+        docs = retrieve_docs(search_queries, config)        
+        print('docs: ', docs)
         
         if 'reference' in state:
             reference = state['reference']
-            reference += filtered_docs
+            reference += docs
         else:
-            reference = filtered_docs
+            reference = docs
         print('len(reference): ', reference)
         
         content = []   
-        if len(filtered_docs):
-            for d in filtered_docs:
+        if len(docs):
+            for d in docs:
                 content.append(d.page_content)            
             print('content: ', content)
         
@@ -3987,60 +3961,6 @@ def isTyping(connectionId, requestId, msg):
     #print('result: ', json.dumps(result))
     sendMessage(connectionId, msg_proceeding)
 
-def removeFunctionXML(msg):
-    #print('msg: ', msg)
-    
-    while(1):
-        start_index = msg.find('<function_calls>')
-        end_index = msg.find('</function_calls>')
-        length = 18
-        
-        if start_index == -1:
-            start_index = msg.find('<invoke>')
-            end_index = msg.find('</invoke>')
-            length = 10
-        
-        output = ""
-        if start_index>=0:
-            # print('start_index: ', start_index)
-            # print('msg: ', msg)
-            
-            if start_index>=1:
-                output = msg[:start_index-1]
-                
-                if output == "\n" or output == "\n\n":
-                    output = ""
-            
-            if end_index >= 1:
-                # print('end_index: ', end_index)
-                output = output + msg[end_index+length:]
-                            
-            msg = output
-        else:
-            output = msg
-            break
-
-    return output
-
-def readStreamMsgForAgent(connectionId, requestId, stream):
-    msg = ""
-    if stream:
-        for event in stream:
-            #print('event: ', event)
-            msg = msg + event
-            
-            output = removeFunctionXML(msg)
-            # print('output: ', output)
-            
-            if len(output)>0 and output[0]!='<':
-                result = {
-                    'request_id': requestId,
-                    'msg': output,
-                    'status': 'proceeding'
-                }
-                #print('result: ', json.dumps(result))
-                sendMessage(connectionId, result)
-            
 def readStreamMsg(connectionId, requestId, stream):
     msg = ""
     if stream:
