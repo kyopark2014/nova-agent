@@ -1862,13 +1862,17 @@ def run_agent_executor2(connectionId, requestId, query):
     
     def final_answer(state):
         print(f"###### final_answer ######")        
-        
+
+        answer = ""        
         if "answer" in state:
-            answer = state['answer']
-            print('answer: ', answer)
+            answer = state['answer']            
         else:
             answer = state["messages"][-1].content
-            print('answer: ', answer)
+
+        if answer.find('<thinking>') != -1:
+            print('Remove <thinking> tag.')
+            answer = answer[answer.find('</thinking>')+13:]
+        print('answer: ', answer)
         
         return {
             "answer": answer
