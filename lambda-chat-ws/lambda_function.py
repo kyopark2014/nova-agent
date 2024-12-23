@@ -3470,8 +3470,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             print('step:', step)
 
             regex = "/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/" # English, Korean, Numbers
-            text = re.compile(regex)
-            print("modified text: ", text)
+            p = re.compile(regex)
+            text2 = p.match(text)
+            print("modified text: ", text2)
 
             result = write_chain.invoke({
                 "intruction": instruction,
