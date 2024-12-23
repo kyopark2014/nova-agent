@@ -3419,7 +3419,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                
                 "다음으로 작성할 글쓰기 단계는 아래입니다."
                 "Next step:"
-                "{STEP}"
+                "{step}"
             )
         else:    
             human = (
@@ -3435,7 +3435,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "{plan}"
 
                 "Next step:"
-                "{STEP}"
+                "{step}"
 
                 "Written text:"
                 "{text}"
@@ -3462,16 +3462,12 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         
         text = ""
         drafts = []
-        for idx, step in enumerate(planning_steps):
+        for idx, step in enumerate(planning_steps):            
             update_state_message(f"executing... (step: {idx+1}/{len(planning_steps)})", config)
-            
-            # Invoke the write_chain
-            chat = get_chat()
-            write_chain = write_prompt | chat
-            
-            print('instruction:', instruction)
-            print('planning_steps:', planning_steps)
+
             print('step:', step)
+            print('instruction:', instruction)
+            print('planning_steps:', planning_steps)            
             print('text:', text)
             
             regex = '/^[ㄱ-ㅎ가-힣a-zA-Z0-9]+$/' # English, Korean, Numbers
@@ -3480,11 +3476,15 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             text2 = m.group(0)
             print("modified text: ", text2)
 
+            # Invoke the write_chain
+            chat = get_chat()
+            write_chain = write_prompt | chat            
+
             result = write_chain.invoke({
                 "intruction": instruction,
                 "plan": planning_steps,
                 "text": text,
-                "STEP": step
+                "step": step
             })
             output = result.content
             print('output: ', output)
