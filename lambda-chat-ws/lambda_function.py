@@ -3481,11 +3481,16 @@ def run_long_form_writing_agent(connectionId, requestId, query):
 
             # Invoke the write_chain
             chat = get_chat()
-            write_chain = write_prompt | chat            
+            write_chain = write_prompt | chat     
+
+
+            plan = ""
+            for p in planning_steps:
+                plan += p + '\n'
 
             result = write_chain.invoke({
                 "intruction": instruction,
-                "plan": planning_steps,
+                "plan": plan,
                 "text": text,
                 "step": step
             })
