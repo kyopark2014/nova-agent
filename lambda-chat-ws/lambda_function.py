@@ -3142,10 +3142,10 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         top_k = numberOfDocs
         
         idx = config.get("configurable", {}).get("idx")
-        parallel_processing = config.get("configurable", {}).get("parallel_processing")
-        print('parallel_processing: ', parallel_processing)
+        parallel_retrieval = config.get("configurable", {}).get("parallel_retrieval")
+        print('parallel_retrieval: ', parallel_retrieval)
         
-        if parallel_processing == 'enable':
+        if parallel_retrieval == 'enable':
             relevant_docs = parallel_retriever(search_queries, config)        
         else:
             for q in search_queries:        
@@ -3174,7 +3174,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         return relevant_docs
         
     def revise_draft(state: ReflectionState, config):   
-        print("###### revise_answer ######")
+        print("###### revise_draft ######")
         
         draft = state['draft']
         search_queries = state['search_queries']
@@ -3548,7 +3548,8 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "max_revisions": MAX_REVISIONS,
                 "requestId":requestId,
                 "connectionId": connectionId,
-                "idx": idx
+                "idx": idx,
+                "parallel_retrieval": "disable" # limited resources
             }
             process = Process(target=reflect_draft, args=(child_conn, reflection_app, idx, app_config, draft))
             processes.append(process)
@@ -3669,11 +3670,11 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         
         update_state_message("revising...", config)
 
-        parallel_processing = config.get("configurable", {}).get("parallel_processing", "")
-        print('parallel_processing: ', parallel_processing)
+        parallel_revise = config.get("configurable", {}).get("parallel_revise", "enable")
+        print('parallel_revise: ', parallel_revise)
         
         # reflection
-        if parallel_processing == 'enable':  # parallel processing
+        if parallel_revise == 'enable':  # parallel processing
             final_doc, references = reflect_drafts_using_parallel_processing(drafts, config)
         else:
             reflection_app = buildReflection()
@@ -3696,7 +3697,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     "requestId":requestId,
                     "connectionId": connectionId,
                     "idx": idx,
-                    "parallel_processing": "disable"  # no parallel since unsufficient resources
+                    "parallel_retrieval": "disable"
                 }
                 output = reflection_app.invoke(inputs, config=app_config)
                 final_doc += output['revised_draft'] + '\n\n'
@@ -3787,7 +3788,8 @@ def run_long_form_writing_agent(connectionId, requestId, query):
     config = {
         "recursion_limit": 50,
         "requestId": requestId,
-        "connectionId": connectionId
+        "connectionId": connectionId,
+        "parallel_revise": "enable" 
     }
     
     output = app.invoke(inputs, config)
