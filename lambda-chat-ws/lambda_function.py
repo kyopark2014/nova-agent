@@ -3179,18 +3179,15 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         if len(search_queries) and len(reflection):
             docs = retrieve_docs(search_queries, config)        
             print('docs: ', docs)
-        
-            reference += docs
-            print('len(reference): ', len(reference))
-        
+                    
             content = []   
-            if len(docs):
+            if len(docs):                
+                update_state_message(f"revising... (generate-{idx})", config)
+
                 for d in docs:
                     content.append(d.page_content)            
                 print('content: ', content)
-            
-                update_state_message(f"revising... (generate-{idx})", config)
-                
+                                    
                 if isKorean(draft):
                     system = (
                         "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
@@ -3250,6 +3247,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 print('--> draft: ', draft)
                 print('--> reflection: ', reflection)
                 print('--> revised_draft: ', revised_draft)
+
+                reference += docs
+                print('len(reference): ', len(reference))
             else:
                 print('No relevant document!')
                 revised_draft = draft
