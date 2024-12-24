@@ -112,6 +112,27 @@ Tool use의 workflow는 아래와 같습니다. 이것은 다양한 tool을 이�
 
 ![image](https://github.com/user-attachments/assets/5be0a600-1e21-43f3-9af4-c3f65dccb4cc)
 
+Toll use의 workflow는 아래와 같이 구현할 수 있습니다. 여기에서 agent와 action은 execution_agent_node와 tool_node로 구성됩니다. agent의 reasoning 결과가 tool_calls 인 경우에는 해당되는 tool을 실행하고, content인 경우에는 종료하고 결과를 final_answer 노드로 보내서 답변을 생성합니다. 
+
+```python
+workflow = StateGraph(State)
+workflow.add_node("agent", execution_agent_node)
+workflow.add_node("action", tool_node)
+workflow.add_node("final_answer", final_answer)
+
+workflow.add_edge(START, "agent")
+workflow.add_conditional_edges(
+    "agent",
+    should_continue,
+    {
+        "continue": "action",
+        "end": "final_answer",
+    },
+)
+workflow.add_edge("action", "agent")
+workflow.add_edge("final_answer", END)
+```
+
 API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 reasoning로 매번 1개의 action을 줌으로써 reasoning - action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
 
 ```java
@@ -158,7 +179,30 @@ Reflection 패턴은 초안을 생성한 후에 개선할 사항을 추출하고
 
 ![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
 
+Reflection의 workflow는 아래와 같습니다. generate 노드에서 생성된 초안(draft)는 reflect에서 수정할 부분과 추가 검색어를 추출합니다. 이후 revise_answer 노드에서는 draft를 개선합니다. 
 
+```python
+workflow = StateGraph(State)
+
+workflow.add_node("generate", generate)
+workflow.add_node("reflect", reflect)
+workflow.add_node("revise_answer", revise_answer)
+
+workflow.set_entry_point("generate")
+
+workflow.add_conditional_edges(
+    "revise_answer", 
+    should_continue, 
+    {
+        "end": END, 
+        "continue": "reflect"}
+)
+
+workflow.add_edge("generate", "reflect")
+workflow.add_edge("reflect", "revise_answer")
+
+app = workflow.compile()
+```
 
 ### Planning
 
@@ -166,6 +210,30 @@ Planing 패턴을 이용하면, CoT(Chain of Thought)형태로 반복적으로 �
 
 ![image](https://github.com/user-attachments/assets/4c0086da-865c-44c3-84fa-64246a10f624)
 
+Planning agent의 workflow는 아래와 같습니다. plan 노드에서 최초 수행할 계획을 세우고, execution 노드에서 첫번째 plan을 실행한 후에 replan에서 업데이트된 plan을 생성합니다. plan/replan 과정을 통해 지속적으로 개선된 flow를 수행하고 축적된 결과들을 이용해 최종 답변을 구합니다. 
+
+```python
+workflow = StateGraph(State)
+workflow.add_node("planner", plan_node)
+workflow.add_node("executor", execute_node)
+workflow.add_node("replaner", replan_node)
+workflow.add_node("final_answer", final_answer)
+
+workflow.set_entry_point("planner")
+workflow.add_edge("planner", "executor")
+workflow.add_edge("executor", "replaner")
+workflow.add_conditional_edges(
+    "replaner",
+    should_end,
+    {
+        "continue": "executor",
+        "end": "final_answer",
+    },
+)
+workflow.add_edge("final_answer", END)
+
+return workflow.compile()
+```
 
 ### Multi-agent Collaboration
 
@@ -173,6 +241,49 @@ Multi-agent collaboration의 예로서 긴글을 쓰는 애플리케이션을 �
 
 ![image](https://github.com/user-attachments/assets/ac783a78-b0af-4b69-9219-60fdab05202e)
 
+여기에서는 planning agent와 reflection agent를 이용해 충분한 contenxt를 가지는 글을 작성합니다. 먼저 planning agnet의 workflow는 아래와 같습니다. plan 노드에서는 글 작성에 필요한 계획을 세우고, execution 노드에서는 초안을 생성합니다. 생성된 초안은 revise_answer 노드에서 reflection을 통해 업데이트 됩니다. 
+
+```python
+workflow = StateGraph(State)
+
+# Add nodes
+workflow.add_node("planning_node", plan_node)
+workflow.add_node("execute_node", execute_node)
+workflow.add_node("revising_node", revise_answer)
+
+# Set entry point
+workflow.set_entry_point("planning_node")
+
+# Add edges
+workflow.add_edge("planning_node", "execute_node")
+workflow.add_edge("execute_node", "revising_node")
+workflow.add_edge("revising_node", END)
+```
+
+Refelection agent의 workflow는 아래와 같습니다. reflection 노드에서는 초안을 개선할 포인트와 추가 검색어를 추출하고 revise_draft 노드에서는 결과를 업데이트 합니다. 
+
+```python
+workflow = StateGraph(ReflectionState)
+
+# Add nodes
+workflow.add_node("reflect_node", reflect_node)
+workflow.add_node("revise_draft", revise_draft)
+
+# Set entry point
+workflow.set_entry_point("reflect_node")
+
+workflow.add_conditional_edges(
+    "revise_draft", 
+    should_continue, 
+    {
+        "end": END, 
+        "continue": "reflect_node"
+    }
+)
+
+# Add edges
+workflow.add_edge("reflect_node", "revise_draft")
+```
 
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
