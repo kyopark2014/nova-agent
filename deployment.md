@@ -120,7 +120,7 @@ cdk deploy --require-approval never --all
 
 6) Hybrid 검색을 위한 Nori Plug-in 설치
 
-[OpenSearch Console](https://us-west-2.console.aws.amazon.com/aos/home?region=us-west-2#opensearch/domains)에서 "langgraph-agent"로 들어가서 [Packages] - [Associate package]을 선택한 후에, 아래와 같이 "analysis-nori"을 설치합니다. 
+[OpenSearch Console](https://us-west-2.console.aws.amazon.com/aos/home?region=us-west-2#opensearch/domains)에서 "nova-agent"로 들어가서 [Packages] - [Associate package]을 선택한 후에, 아래와 같이 "analysis-nori"을 설치합니다. 
 
 ![image](https://github.com/user-attachments/assets/9297a93a-cf25-4fea-aae1-8b6b00e79949)
 
