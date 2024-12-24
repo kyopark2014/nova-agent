@@ -1,7 +1,14 @@
 # Amazon Nova 활용하기
 
-여기에서는 Amazon의 Nova와 Agentic Workflow를 이용하여 복잡한 Application을 구현하는것을 설명합니다.
+여기에서는 Amazon의 Nova를 활용하여 Chat, RAG를 구성하고, Agentic Workflow를 이용하여 복잡한 Application을 구현하는것을 설명합니다.
 
+
+## Architecture
+
+전체적인 Architecture는 아래와 같습니다. 속도 향상을 위해 Multi-region을 활용하고 OpenSearch를 이용해 RAG를 구성하고 인터넷 검색은 Tavily를 이용합니다. 여기에서는 변화하는 트래픽과 유지보수 비용면에서 장점이 있는 서버리스를 활용합니다. 결과를 스트림으로 제공하기 위하여 WebSocket 지원하는 API Gateway와 Lambda를 이용해 API를 구성합니다. 여기에서는 LangChain을 이용해 Chat, Hybrid RAG, CRAG, Self RAG, Self Corrective RAG, Translation을 구현합니다. 또한, LangGraph를 이용해 tool use, planning, reflection, multi-agent collaboration을 구현합니다.
+
+<img src="https://github.com/user-attachments/assets/910b0706-52d5-4c91-8c09-5e9ab90097b6" width="800">
+   
 ## Basic Chat
 
 [Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. Nova Pro에 맞게 model_id와 parameter를 지정합니다. 
