@@ -91,7 +91,7 @@ Corrective RAG는 retrival/grading 후에 질문을 rewrite한 후 인터넷 검
 
 ### Self RAG
 
-Self RAG는 retrive/grading 후에 generation을 수행하는데, grading의 결과에 따라 필요시 rewtire후 retrive를 수행하며, 생성된 결과가 hallucination인지, 답변이 적절한지를 판단하여 필요시 rewtire / retrieve를 반복합니다. 
+Self RAG는 retrieve/grading 후에 generation을 수행하는데, grading의 결과에 따라 필요시 rewtire후 retrieve를 수행하며, 생성된 결과가 hallucination인지, 답변이 적절한지를 판단하여 필요시 rewtire / retrieve를 반복합니다. 
 
 ![image](https://github.com/user-attachments/assets/b1f2db6c-f23f-4382-86f6-0fa7d3fe0595)
 
