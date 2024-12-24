@@ -29,7 +29,6 @@ from multiprocessing import Process, Pipe
 from langchain_aws import BedrockEmbeddings
 from langchain_community.vectorstores.faiss import FAISS
 
-# from langchain.agents import tool
 from langchain_core.tools import tool
 from bs4 import BeautifulSoup
 from pytz import timezone
@@ -2987,7 +2986,7 @@ def run_knowledge_guru(connectionId, requestId, query):
 
     
 ####################### LangGraph #######################
-# Long form Writing Agent
+# Multi-agent Collaboration (Long form Writing Agent)
 #########################################################
 def run_long_form_writing_agent(connectionId, requestId, query):
     # Workflow - Reflection
