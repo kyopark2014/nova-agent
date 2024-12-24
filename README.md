@@ -276,6 +276,7 @@ Amazon S3에 파일 업로드하면 자동으로 파싱하여 OpenSearch로 구�
 
 [여수 여행](./contents/여수_여행_정보_및_추천.md)
 
+[제주 여행](./contents/Jeju_travel_experience.md)
 
 ## 리소스 정리하기 
 
