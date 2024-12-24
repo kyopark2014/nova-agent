@@ -104,6 +104,8 @@ Self Corrective RAG는 Self RAG처럼 retrieve / generate 후에 hallucination�
 
 ## Agent
 
+여기에서는 LangGraph를 이용하여 tool use, reflection, planning, multi-agnet collaboration과 같은 패턴을 구현하고 동작을 비교합니다. 
+
 ### Tool Use
 
 Tool use의 workflow는 아래와 같습니다. 이것은 다양한 tool을 이용해 자연스러운 대화를 수행할 수 있어서 가장 일반적으로 활용되는 agent 구현 패턴입니다. 
@@ -157,44 +159,6 @@ Reflection 패턴은 초안을 생성한 후에 개선할 사항을 추출하고
 ![image](https://github.com/user-attachments/assets/a2b15e31-c727-41c9-9857-9e6082d05811)
 
 
-Reasoning을 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
-
-```text
-지방 조직이 분비하는 exosome들은 면역 체계에 다양한 역할을 할 수 있습니다. exosome은 세포 간 통신을 위한 중요한 매개체로, 다양한 생물학적 물질을 운반하여 면역 반응을 조절할 수 있습니다. 예를 들어, exosome은 면역 세포의 활성화, 염증 반응의 조절, 그리고 면역 기억의 형성에 관여할 수 있습니다. 
-exosome을 통해 전달되는 신호 분자들은 면역 세포의 기능을 조절하여 감염이나 염증에 대한 반응을 조절할 수 있습니다. 또한, exosome은 면역 세포 간의 상호작용을 촉진하여 면역 반응을 강화하거나 억제할 수 있습니다.
-좋은 exosome을 분비하여 당뇨나 질병을 예방하는 방법에 대해서는 현재까지 명확한 연구 결과가 없습니다. 그러나 일반적으로 건강한 생활 습관을 유지하고, 균형 잡힌 식사를 하며, 규칙적인 운동을 하는 것이 면역 체계를 강화하고 질병 예방에 도움이 될 수 있습니다. 또한, 스트레스 관리와 충분한 수면도 면역 체계의 건강에 중요한 역할을 합니다.
-참고로, exosome의 역할과 면역 체계에 대한 연구는 지속적으로 진행되고 있으며, 향후 더 많은 연구 결과가 나올 것으로 기대됩니다.
-```
-
-Reflection에서 도출된 개선 사항입니다. 
-
-```text
-reflection:
-missing='더 구체적인 exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 연구 결과,
-advisable='exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 최신 연구 결과를 찾아보는 것이 좋을 것 같습니다.' 
-superfluous='건강한 생활 습관, 균형 잡힌 식사, 규칙적인 운동, 스트레스 관리, 충분한 수면에 대한 설명은 exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 연구 결과와 직접적인 관련이 없습니다.'
-
-search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연구 결과', 'exosome을 통한 당뇨나 질병 예방에 대한 연구 결과', 'exosome과 면역 체계의 상호작용에 대한 최신 연구 동향'
-```
-
-개선사항을 반영한 답변입니다. 전체 길이는 572자 입니다. 초안를 reflection를 이용해 개선하였고 길이도 30%정도 증가하였습니다.
-
-![noname](https://github.com/user-attachments/assets/c040ca53-ee72-4358-a4a2-2d4ef47199d3)
-
-전체 동작을 LangSmith를 이용해 확인하면 아래와 같습니다. 전체적으로 47초가 소요되었습니다. 먼저 reasoning을 통해 질문에서 2개의 검색어를 추출하여 tavily로 검색을 한 후에 초안을 생성하였습니다. 이후 개선할 사항을 추출하고 이를 반영하기 위하여 3회 추가 검색을 수행하여 최종 답변을 생성하였습니다.
-
-![noname](https://github.com/user-attachments/assets/5c81d318-34eb-4948-ab22-42c8502b750f)
-
-
-이번에는 "Amazon에서 SA로 일하는것"라고 입력하고 결과를 확인합니다.
-
-![noname](https://github.com/user-attachments/assets/f3bc351e-acb6-462e-a86b-9a33449b6013)
-
-
-이때의 동작을 LangSmith로 확인합니다. 여기에서는 3번의 검색을 통해, 초안(draft)를 생성한 후에 3회 추가 검색을 통해 초안의 답변을 향상시켰습니다.
-
-![noname](https://github.com/user-attachments/assets/426e7a43-2f0a-4eb1-a5f7-14148dab74f4)
-
 
 ### Planning
 
@@ -202,29 +166,6 @@ Planing 패턴을 이용하면, CoT(Chain of Thought)형태로 반복적으로 �
 
 ![image](https://github.com/user-attachments/assets/4c0086da-865c-44c3-84fa-64246a10f624)
 
-이때 처음 생성된 plan은 아래와 같습니다.
-
-```text
-planning_steps:
-
-1. LLM Ops의 개념과 중요성을 파악합니다.
-
-2. LLM Ops의 주요 구성 요소와 기능을 설명합니다.
-
-3. LLM Ops의 구현 방법과 도구에 대해 설명합니다.
-
-4. LLM Ops의 장점과 잠재적인 문제점을 분석합니다.
-```
-
-plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 반복하면서 원하는 답변을 찾습니다.
-
-이때의 결과는 아래와 같습니다.
-
-![noname](https://github.com/user-attachments/assets/91457669-bf2a-422d-887a-ddc3ca763fdd)
-
-이를 실행을 보면 아래와 같이 plan / execute / replan의 과정을 통해 답변을 얻었음을 알 수 있습니다.
-
-![noname](https://github.com/user-attachments/assets/8f1e5860-ebf1-402f-880d-28da222197e3)
 
 ### Multi-agent Collaboration
 
@@ -233,14 +174,6 @@ Multi-agent collaboration의 예로서 긴글을 쓰는 애플리케이션을 �
 ![image](https://github.com/user-attachments/assets/ac783a78-b0af-4b69-9219-60fdab05202e)
 
 
-아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 7067자(글자만 5446)의 답변이 생성되었습니다.
-![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
-
-이때 동작시간을 확인하면 아래와 같습니다.
-
-![image](https://github.com/user-attachments/assets/5daa6eb3-7b0c-41d3-9f08-1ee6c974252e)
-
-이때, 사용된 입력과 출력 token의 숫자는 각각 19,328과 7,787입니다. 
 
 ### Claude Sonnet과 Nova Pro의 Agent 동작 비교
 
@@ -283,6 +216,76 @@ Amazon S3에 파일 업로드하면 자동으로 파싱하여 OpenSearch로 구�
 ![noname](https://github.com/user-attachments/assets/f8fa8ccd-5a50-454b-beb0-197cf6af1b48)
 
 
+### Agent
+
+#### Reflection
+
+Reasoning을 통해 tool로 search가 선택되였고, '지방 조직 exosome 면역체계 역할'와 '지방 조직 exosome 당뇨 예방'을 검색하여 초안(draft)을 작성합니다. 초안은는 아래와 같고, 전체 길이는 443자입니다.
+
+```text
+지방 조직이 분비하는 exosome들은 면역 체계에 다양한 역할을 할 수 있습니다. exosome은 세포 간 통신을 위한 중요한 매개체로, 다양한 생물학적 물질을 운반하여 면역 반응을 조절할 수 있습니다. 예를 들어, exosome은 면역 세포의 활성화, 염증 반응의 조절, 그리고 면역 기억의 형성에 관여할 수 있습니다. 
+exosome을 통해 전달되는 신호 분자들은 면역 세포의 기능을 조절하여 감염이나 염증에 대한 반응을 조절할 수 있습니다. 또한, exosome은 면역 세포 간의 상호작용을 촉진하여 면역 반응을 강화하거나 억제할 수 있습니다.
+좋은 exosome을 분비하여 당뇨나 질병을 예방하는 방법에 대해서는 현재까지 명확한 연구 결과가 없습니다. 그러나 일반적으로 건강한 생활 습관을 유지하고, 균형 잡힌 식사를 하며, 규칙적인 운동을 하는 것이 면역 체계를 강화하고 질병 예방에 도움이 될 수 있습니다. 또한, 스트레스 관리와 충분한 수면도 면역 체계의 건강에 중요한 역할을 합니다.
+참고로, exosome의 역할과 면역 체계에 대한 연구는 지속적으로 진행되고 있으며, 향후 더 많은 연구 결과가 나올 것으로 기대됩니다.
+```
+
+Reflection에서 도출된 개선 사항입니다. 
+
+```text
+reflection:
+missing='더 구체적인 exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 연구 결과,
+advisable='exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 최신 연구 결과를 찾아보는 것이 좋을 것 같습니다.' 
+superfluous='건강한 생활 습관, 균형 잡힌 식사, 규칙적인 운동, 스트레스 관리, 충분한 수면에 대한 설명은 exosome의 면역 체계에서의 역할과 당뇨나 질병 예방에 대한 연구 결과와 직접적인 관련이 없습니다.'
+
+search_queries: 'exosome의 면역 체계에서의 역할에 대한 최신 연구 결과', 'exosome을 통한 당뇨나 질병 예방에 대한 연구 결과', 'exosome과 면역 체계의 상호작용에 대한 최신 연구 동향'
+```
+
+개선사항을 반영한 답변입니다. 전체 길이는 572자 입니다. 초안를 reflection를 이용해 개선하였고 길이도 30%정도 증가하였습니다.
+
+![noname](https://github.com/user-attachments/assets/c040ca53-ee72-4358-a4a2-2d4ef47199d3)
+
+전체 동작을 LangSmith를 이용해 확인하면 아래와 같습니다. 전체적으로 47초가 소요되었습니다. 먼저 reasoning을 통해 질문에서 2개의 검색어를 추출하여 tavily로 검색을 한 후에 초안을 생성하였습니다. 이후 개선할 사항을 추출하고 이를 반영하기 위하여 3회 추가 검색을 수행하여 최종 답변을 생성하였습니다.
+
+![noname](https://github.com/user-attachments/assets/5c81d318-34eb-4948-ab22-42c8502b750f)
+
+
+이번에는 "Amazon에서 SA로 일하는것"라고 입력하고 결과를 확인합니다.
+
+![noname](https://github.com/user-attachments/assets/f3bc351e-acb6-462e-a86b-9a33449b6013)
+
+
+이때의 동작을 LangSmith로 확인합니다. 여기에서는 3번의 검색을 통해, 초안(draft)를 생성한 후에 3회 추가 검색을 통해 초안의 답변을 향상시켰습니다.
+
+![noname](https://github.com/user-attachments/assets/426e7a43-2f0a-4eb1-a5f7-14148dab74f4)
+
+
+
+#### Planning
+
+"LLM Ops에 대해 설명해줘"라고 입력시 처음 생성된 plan은 아래와 같습니다.
+
+```text
+planning_steps:
+
+1. LLM Ops의 개념과 중요성을 파악합니다.
+
+2. LLM Ops의 주요 구성 요소와 기능을 설명합니다.
+
+3. LLM Ops의 구현 방법과 도구에 대해 설명합니다.
+
+4. LLM Ops의 장점과 잠재적인 문제점을 분석합니다.
+```
+
+plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 반복하면서 원하는 답변을 찾습니다.
+
+이때의 결과는 아래와 같습니다.
+
+![noname](https://github.com/user-attachments/assets/91457669-bf2a-422d-887a-ddc3ca763fdd)
+
+이를 실행을 보면 아래와 같이 plan / execute / replan의 과정을 통해 답변을 얻었음을 알 수 있습니다.
+
+![noname](https://github.com/user-attachments/assets/8f1e5860-ebf1-402f-880d-28da222197e3)
+
 
 ### Multi-modal 시험
 
@@ -297,11 +300,22 @@ Amazon S3에 파일 업로드하면 자동으로 파싱하여 OpenSearch로 구�
 
 ### Multi-agent Collaboration
 
-[지방 조직이 분비하는 exosome들이 어떻게 면역체계에 역할을 하고 어떻게 하면 좋은 exosome들을 분비시켜 당뇨나 병을 예방할수 있는지 알려주세요.](./contents/지방_exosome의_면역_역할과_예방_방법.md)
+채팅창에서 "지방 조직이 분비하는 exosome들이 어떻게 면역체계에 역할을 하고 어떻게 하면 좋은 exosome들을 분비시켜 당뇨나 병을 예방할수 있는지 알려주세요."라고 입력후 결과를 확인합니다. 아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 7067자(글자만 5446)의 답변이 생성되었습니다.
+![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
 
-[여수 여행](./contents/여수_여행_정보_및_추천.md)
+이때 동작시간을 확인하면 아래와 같습니다.
 
-[제주 여행](./contents/Jeju_travel_experience.md)
+![image](https://github.com/user-attachments/assets/5daa6eb3-7b0c-41d3-9f08-1ee6c974252e)
+
+이때, 사용된 입력과 출력 token의 숫자는 각각 19,328과 7,787입니다. 
+
+Multi-agent collaboration을 이용해 작성된 보고서의 예는 아래와 같습니다. 
+
+- [지방 조직이 분비하는 exosome들이 어떻게 면역체계에 역할을 하고 어떻게 하면 좋은 exosome들을 분비시켜 당뇨나 병을 예방할수 있는지 알려주세요.](./contents/지방_exosome의_면역_역할과_예방_방법.md)
+
+- [여수 여행](./contents/여수_여행_정보_및_추천.md)
+
+- [제주 여행](./contents/Jeju_travel_experience.md)
 
 ## 리소스 정리하기 
 
