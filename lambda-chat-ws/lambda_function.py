@@ -3537,7 +3537,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "requestId":requestId,
                 "connectionId": connectionId,
                 "idx": idx,
-                "parallel_retrieval": "enable" # 
+                "parallel_retrieval": multi_region
             }
             process = Process(target=reflect_draft, args=(child_conn, reflection_app, idx, app_config, draft))
             processes.append(process)
@@ -3777,7 +3777,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         "recursion_limit": 50,
         "requestId": requestId,
         "connectionId": connectionId,
-        "parallel_revise": "disable" 
+        "parallel_revise": multi_region
     }
     
     output = app.invoke(inputs, config)
