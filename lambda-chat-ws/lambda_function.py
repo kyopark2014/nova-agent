@@ -3537,7 +3537,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 "requestId":requestId,
                 "connectionId": connectionId,
                 "idx": idx,
-                "parallel_retrieval": multi_region
+                "parallel_retrieval": "enable"
             }
             process = Process(target=reflect_draft, args=(child_conn, reflection_app, idx, app_config, draft))
             processes.append(process)
@@ -3551,7 +3551,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
             if result is not None:
                 print('result: ', result)
                 revised_drafts[result['idx']] = result['revised_draft']
-                references += result['reference']
+
+                if result['reference']:
+                    references += result['reference']
 
         for process in processes:
             process.join()
@@ -3685,7 +3687,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     "requestId":requestId,
                     "connectionId": connectionId,
                     "idx": idx,
-                    "parallel_retrieval": "enable"
+                    "parallel_retrieval": "disable"
                 }
                 output = reflection_app.invoke(inputs, config=app_config)
                 final_doc += output['revised_draft'] + '\n\n'
