@@ -79,14 +79,13 @@ stream = chain.invoke(
 msg = readStreamMsg(connectionId, requestId, stream.content)    
 ```
 
-## Multi-modal
-
-
-
-
 ## Agent
 
 ### Tool Use
+
+Tool use의 workflow는 아래와 같습니다.
+
+![image](https://github.com/user-attachments/assets/5be0a600-1e21-43f3-9af4-c3f65dccb4cc)
 
 API 처리를 이해하기 위해 "서울과 부산의 현재 날씨를 비교해주세요."라고 입력하면 Nova Pro의 경우에 reasoning 결과로 아래의 2개 API를 호출하게 됩니다. Claude Sonnet은 reasoning로 매번 1개의 action을 줌으로써 reasoning - action 동작을 2회 수행하지만, Nova Pro는 가능하다면 한번에 2개 API를 호출할 수 있도록 아래와 같은 응답을 제공합니다.
 
@@ -203,6 +202,11 @@ plan을 먼저 만든 후에, 첫번째 execute를 하고 이후로 replan을 �
 ![noname](https://github.com/user-attachments/assets/8f1e5860-ebf1-402f-880d-28da222197e3)
 
 ### Multi-agent Collaboration
+
+Multi-agent collaboration의 예로서 긴글을 쓰는 애플리케이션을 만들고자 합니다. 이때의 workflow는 아래와 같습니다.
+
+![image](https://github.com/user-attachments/assets/ac783a78-b0af-4b69-9219-60fdab05202e)
+
 
 아래는 [Multi-agent Collaboration의 결과](./contents/지방_exosome의_면역_역할과_예방_방법.md)의 일부분입니다. 7067자(글자만 5446)의 답변이 생성되었습니다.
 ![noname](https://github.com/user-attachments/assets/34e6e9b5-bc3e-4607-85a6-b7bb7931e1b3)
