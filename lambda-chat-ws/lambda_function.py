@@ -3044,6 +3044,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 structured_llm = chat.with_structured_output(Research, include_raw=True)
             
             try:
+                print('draft: ', draft)
                 info = structured_llm.invoke(draft)
                 print(f'attempt: {attempt}, info: {info}')
                     
