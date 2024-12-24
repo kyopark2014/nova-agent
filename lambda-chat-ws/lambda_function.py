@@ -3039,7 +3039,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         for attempt in range(5):
             chat = get_chat()
             if isKorean(draft):
-                structured_llm = chat.with_structured_output(ResearchKor, include_raw=True)
+                structured_llm = chat.with_structured_output(Research, include_raw=True)
             else:
                 structured_llm = chat.with_structured_output(Research, include_raw=True)
             
@@ -3073,9 +3073,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     print('search_queries (mixed): ', search_queries)
                     break
             except Exception:
-                print('length: ', len(draft))    
-                print('draft: ', draft)
-
                 err_msg = traceback.format_exc()
                 print('error message: ', err_msg)                    
                 raise Exception ("Not able to request to LLM")               
