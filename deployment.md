@@ -84,7 +84,7 @@ git clone https://github.com/kyopark2014/nova-agent
 2) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
 
 ```java
-cd langgraph-agent/cdk-nova-agent/ && npm install
+cd nova-agent/cdk-nova-agent/ && npm install
 ```
 
 3) CDK 사용을 위해 Boostraping을 수행합니다.
