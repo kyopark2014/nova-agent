@@ -3171,7 +3171,7 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         update_state_message(f"revising... (retrieve-{idx})", config)
         
         # reference = state['reference'] if 'reference' in state else []     
-        if 'reference' in state       
+        if 'reference' in state:
             reference = state['reference'] 
         else:
             reference = []            
