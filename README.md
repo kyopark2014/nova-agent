@@ -1,6 +1,6 @@
 # Amazon Nova 활용하기
 
-여기에서는 Amazon의 Nova를 활용하여 chat, RAG를 구현하고, CRAG, Self RAG, Self Corrective RAG를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 Agentic Workflow를 Amazon Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Amazon Nova는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow를 구현에 적절한 모델입니다.
+여기에서는 Amazon의 Nova Pro 모델을 활용하여 chat, RAG를 구현하고, CRAG, Self RAG, Self Corrective RAG를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 agentic workflow를 Amazon Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Amazon Nova는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow를 구현에 적절한 모델입니다.
 
 
 ## Architecture 개요
