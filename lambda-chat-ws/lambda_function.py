@@ -1543,7 +1543,7 @@ def get_reg_chain(langMode):
     if langMode:
         system = (
             "Reference Text를 이용하여 상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
-            "Assistant의 이름은 서연이고, 모르는 질문을 받으면 솔직히 모른다고 말합니다."    
+            "모르는 질문을 받으면 솔직히 모른다고 말합니다."    
         )
     else: 
         system = (
