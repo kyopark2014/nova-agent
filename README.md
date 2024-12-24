@@ -3,13 +3,13 @@
 여기에서는 Amazon의 Nova를 활용하여 chat, RAG를 구현하고, CRAG, Self RAG, Self Corrective RAG를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 Agentic Workflow를 Amazon Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Amazon Nova는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow를 구현에 적절한 모델입니다.
 
 
-## Architecture
+## Architecture 개요
 
 전체적인 Architecture는 아래와 같습니다. 속도 향상을 위해 Multi-region을 활용하고 OpenSearch를 이용해 RAG를 구성하고 인터넷 검색은 Tavily를 이용합니다. 여기에서는 변화하는 트래픽과 유지보수 비용면에서 장점이 있는 서버리스를 활용합니다. 결과를 스트림으로 제공하기 위하여 WebSocket 지원하는 API Gateway와 Lambda를 이용해 API를 구성합니다. 여기에서는 LangChain을 이용해 Chat, Hybrid RAG, CRAG, Self RAG, Self Corrective RAG, Translation을 구현합니다. 또한, LangGraph를 이용해 tool use, planning, reflection, multi-agent collaboration을 구현합니다.
 
 <img src="https://github.com/user-attachments/assets/6347a5ec-332c-4636-b2e3-f173574fad1f" width="800">
 
-## Chat
+## Chat의 구현 
 
 [Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. Nova Pro에 맞게 model_id와 parameter를 지정합니다. 
 
