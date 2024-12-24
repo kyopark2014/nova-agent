@@ -7,9 +7,9 @@
 
 전체적인 Architecture는 아래와 같습니다. 속도 향상을 위해 Multi-region을 활용하고 OpenSearch를 이용해 RAG를 구성하고 인터넷 검색은 Tavily를 이용합니다. 여기에서는 변화하는 트래픽과 유지보수 비용면에서 장점이 있는 서버리스를 활용합니다. 결과를 스트림으로 제공하기 위하여 WebSocket 지원하는 API Gateway와 Lambda를 이용해 API를 구성합니다. 여기에서는 LangChain을 이용해 Chat, Hybrid RAG, CRAG, Self RAG, Self Corrective RAG, Translation을 구현합니다. 또한, LangGraph를 이용해 tool use, planning, reflection, multi-agent collaboration을 구현합니다.
 
-<img src="https://github.com/user-attachments/assets/910b0706-52d5-4c91-8c09-5e9ab90097b6" width="800">
-   
-## Basic Chat
+<img src="https://github.com/user-attachments/assets/6347a5ec-332c-4636-b2e3-f173574fad1f" width="800">
+
+## Chat
 
 [Nova Prompt](https://docs.aws.amazon.com/nova/latest/userguide/prompting-precision.html)를 참조하여, system과 human prompt를 정의하고 history까지 포함하여 invoke 한 후에 결과를 stream으로 client로 전송합니다. Nova Pro에 맞게 model_id와 parameter를 지정합니다. 
 
@@ -71,12 +71,9 @@ human = (
 
     "Reference texts: "
     "{context}"
-)
-    
+)    
 prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
-               
 chain = prompt | chat
-
 stream = chain.invoke(
     {
         "context": context,
@@ -86,11 +83,30 @@ stream = chain.invoke(
 msg = readStreamMsg(connectionId, requestId, stream.content)    
 ```
 
+### Corrective RAG
+
+Corrective RAG는 retrival/grading 후에 질문을 rewrite한 후 인터넷 검색에서 얻어진 결과로 RAG의 성능을 강화하는 방법입니다. 
+
+![image](https://github.com/user-attachments/assets/27228159-b307-4588-8a8a-61d8deaa90e3)
+
+### Self RAG
+
+Self RAG는 retrive/grading 후에 generation을 수행하는데, grading의 결과에 따라 필요시 rewtire후 retrive를 수행하며, 생성된 결과가 hallucination인지, 답변이 적절한지를 판단하여 필요시 rewtire / retrieve를 반복합니다. 
+
+![image](https://github.com/user-attachments/assets/b1f2db6c-f23f-4382-86f6-0fa7d3fe0595)
+
+### Self Corrective RAG
+
+Self Corrective RAG는 Self RAG처럼 retrieve / generate 후에 hallucination인지 답변이 적절한지 확인후 필요시 질문을 rewrite하거나 인터넷 검색을 통해 RAG의 성능을 향상시키는 방법입니다. 
+
+![image](https://github.com/user-attachments/assets/9a18f7f9-0249-42f7-983e-c5a7f9d18682)
+
+
 ## Agent
 
 ### Tool Use
 
-Tool use의 workflow는 아래와 같습니다.
+Tool use의 workflow는 아래와 같습니다. 이것은 다양한 tool을 이용해 자연스러운 대화를 수행할 수 있어서 가장 일반적으로 활용되는 agent 구현 패턴입니다. 
 
 ![image](https://github.com/user-attachments/assets/5be0a600-1e21-43f3-9af4-c3f65dccb4cc)
 
@@ -131,6 +147,8 @@ Claude Sonnet의 Reasoning 결과는 아래와 같습니다.
    }
 ]
 ```
+
+
 
 ### Reflection
 
