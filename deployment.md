@@ -13,7 +13,7 @@ LLM으로 Amazon Nova Pro을 사용하기 위하여, Amazon Bedrock의 us-west-2
 
 #### EC2 생성
 
-[EC2 - LaunchInstances](https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#LaunchInstances:)에 접속하여 Name으로 "chatbot"이라고 입력합니다.
+[EC2 - Launch an Instance](https://us-west-2.console.aws.amazon.com/ec2/home?region=us-west-2#LaunchInstances:)에 접속하여 Name으로 "chatbot"이라고 입력합니다.
 
 ![noname](https://github.com/user-attachments/assets/acdac538-ea1e-4b32-a7f8-efc2b0e34664)
 
