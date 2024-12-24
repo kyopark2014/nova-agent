@@ -2,22 +2,14 @@
 
 ## Bedrock 사용 권한 설정하기
 
-LLM으로 Anthropic의 Claude3을 사용하기 위하여, Amazon Bedrock의 us-west-2 리전을 사용합니다. [Model access](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)에 접속해서 [Edit]를 선택하여 "Titan Text Embeddings V2"와 "Anthropic Claude3 Sonnet"을 Vector Embedding과 LLM을 위해 enable 합니다.
-
-![image](https://github.com/user-attachments/assets/f259bb17-cbd4-4f9e-8025-6552953a5899)
-
-![image](https://github.com/user-attachments/assets/1d36a962-27db-4fcf-857d-8b1e8b67af75)
+LLM으로 Amazon Nova Pro을 사용하기 위하여, Amazon Bedrock의 us-west-2, us-east-1, us-east-2 리전을 사용합니다. [Model access](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)에 접속해서 [Edit]를 선택하여 "Titan Text Embeddings V2"와 "Amazon Nova Pro"을 Vector Embedding과 LLM을 위해 enable 합니다.
 
 
 ## 설치하기
 
-Cloud9이 Deprecated될 예정이므로 EC2를 사용하여 설치하는것을 추천 드립니다. 기존 계정의 경우에 Cloud9을 계속 사용할 수 있습니다.
-
-
 ### EC2를 사용하여 설치 환경 구성하기
 
 여기서는 편의상 us-west-2 (Oregon) 리전을 사용합니다.
-
 
 #### EC2 생성
 
