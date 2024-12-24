@@ -6,7 +6,7 @@
 
 전체적인 Architecture는 아래와 같습니다. 속도 향상을 위해 Multi-region을 활용하고 OpenSearch를 이용해 RAG를 구성하고 인터넷 검색은 [Tavily](https://tavily.com/)를 이용합니다. 여기에서는 변화하는 트래픽과 유지보수 비용면에서 장점이 있는 서버리스를 활용합니다. 결과를 스트림으로 제공하기 위하여 WebSocket 지원하는 [API Gateway](https://docs.aws.amazon.com/ko_kr/apigateway/latest/developerguide/welcome.html)와 [AWS Lambda](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)를 이용해 API를 구성합니다. 여기에서는 [LangChain](https://python.langchain.com/docs/introduction/)을 이용해 Chat, Hybrid RAG, Translation을 구현하고, [LangGraph](https://langchain-ai.github.io/langgraph/)를 이용하여 CRAG, Self RAG, Self Corrective RAG와 agentic workflow의 4가지 패턴인 tool use, planning, reflection, multi-agent collaboration을 구현합니다.
 
-<img src="https://github.com/user-attachments/assets/6347a5ec-332c-4636-b2e3-f173574fad1f" width="800">
+<img src="https://github.com/user-attachments/assets/27afdb89-fc2e-4dc1-a2e1-f1423cbf685c" width="800">
 
 ## Chat의 구현 
 
