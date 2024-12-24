@@ -3169,83 +3169,87 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('revise_draft idx: ', idx)
         update_state_message(f"revising... (retrieve-{idx})", config)
         
-        docs = retrieve_docs(search_queries, config)        
-        print('docs: ', docs)
+        if len(search_queries) and len(reflection):
+            docs = retrieve_docs(search_queries, config)        
+            print('docs: ', docs)
         
-        if 'reference' in state:
-            reference = state['reference']
-            reference += docs
-        else:
-            reference = docs
-        print('len(reference): ', reference)
-        
-        content = []   
-        if len(docs):
-            for d in docs:
-                content.append(d.page_content)            
-            print('content: ', content)
-        
-            update_state_message(f"revising... (generate-{idx})", config)
-            
-            if isKorean(draft):
-                system = (
-                    "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
-                    "draft을 critique과 information 사용하여 수정하십시오."
-                    "최종 결과는 한국어로 작성하고 <result> tag를 붙여주세요."
-                )
-                human = (
-                    "draft:"
-                    "{draft}"
-                                
-                    "critique:"
-                    "{reflection}"
-
-                    "information:"
-                    "{content}"
-                )
-            else:    
-                system = (
-                    "You are an excellent writing assistant." 
-                    "Revise this draft using the critique and additional information."
-                    "Provide the final answer with <result> tag."
-                )
-                human = (                            
-                    "draft:"
-                    "{draft}"
-                                
-                    "critique:"
-                    "{reflection}"
-
-                    "information:"
-                    "{content}"
-                )
-                        
-            revise_prompt = ChatPromptTemplate([
-                ('system', system),
-                ('human', human)
-            ])
-
-            chat = get_chat()
-            reflect = revise_prompt | chat
-            
-            res = reflect.invoke(
-                {
-                    "draft": draft,
-                    "reflection": reflection,
-                    "content": content
-                }
-            )
-            output = res.content
-            # print('output: ', output)
-            
-            if output.find('<result>') == -1:
-                revised_draft = output
+            if 'reference' in state:
+                reference = state['reference']
+                reference += docs
             else:
-                revised_draft = output[output.find('<result>')+8:output.find('</result>')]
+                reference = docs
+            print('len(reference): ', reference)
+        
+            content = []   
+            if len(docs):
+                for d in docs:
+                    content.append(d.page_content)            
+                print('content: ', content)
+            
+                update_state_message(f"revising... (generate-{idx})", config)
                 
-            print('--> draft: ', draft)
-            print('--> reflection: ', reflection)
-            print('--> revised_draft: ', revised_draft)
+                if isKorean(draft):
+                    system = (
+                        "당신은 장문 작성에 능숙한 유능한 글쓰기 도우미입니다."                
+                        "draft을 critique과 information 사용하여 수정하십시오."
+                        "최종 결과는 한국어로 작성하고 <result> tag를 붙여주세요."
+                    )
+                    human = (
+                        "draft:"
+                        "{draft}"
+                                    
+                        "critique:"
+                        "{reflection}"
+
+                        "information:"
+                        "{content}"
+                    )
+                else:    
+                    system = (
+                        "You are an excellent writing assistant." 
+                        "Revise this draft using the critique and additional information."
+                        "Provide the final answer with <result> tag."
+                    )
+                    human = (                            
+                        "draft:"
+                        "{draft}"
+                                    
+                        "critique:"
+                        "{reflection}"
+
+                        "information:"
+                        "{content}"
+                    )
+                            
+                revise_prompt = ChatPromptTemplate([
+                    ('system', system),
+                    ('human', human)
+                ])
+
+                chat = get_chat()
+                reflect = revise_prompt | chat
+                
+                res = reflect.invoke(
+                    {
+                        "draft": draft,
+                        "reflection": reflection,
+                        "content": content
+                    }
+                )
+                output = res.content
+                # print('output: ', output)
+                
+                if output.find('<result>') == -1:
+                    revised_draft = output
+                else:
+                    revised_draft = output[output.find('<result>')+8:output.find('</result>')]
+                    
+                print('--> draft: ', draft)
+                print('--> reflection: ', reflection)
+                print('--> revised_draft: ', revised_draft)
+            else:
+                print('No relevant document!')
+                revised_draft = draft
         else:
             print('No reflection!')
             revised_draft = draft
