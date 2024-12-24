@@ -109,11 +109,12 @@ cdk deploy --require-approval never --all
 
 인프라가 설치가 되면 아래와 같은 Output을 확인할 수 있습니다. 
 
-![noname](https://github.com/user-attachments/assets/21488aac-9319-4f80-bc7f-c2c855a68ac9)
+![noname](https://github.com/user-attachments/assets/7952f4f4-950d-4999-8411-1a629acffecd)
+
 
 5) Output의 HtmlUpdateCommend을 아래와 같이 복사하여 실행합니다.
 
-![noname](https://github.com/user-attachments/assets/f7971246-3b38-441e-935c-b1ebfd5b3be9)
+![noname](https://github.com/user-attachments/assets/48824379-b2ad-4377-916b-82988be90182)
 
     
 
