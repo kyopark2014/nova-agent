@@ -1,7 +1,6 @@
 # Amazon Nova 활용하기
 
-여기에서는 Amazon의 Nova Pro 모델을 활용하여 chat, Hybrid를 지원하는 RAG를 구현하고, CRAG, Self RAG, Self Corrective RAG를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 agentic workflow의 4가지 대표적인 패턴인 tool use, reflection, planning, multi-agent collaboration을 Amazon Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Amazon Nova는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow 구현에 적절한 모델입니다.
-
+여기에서는 [Amazon의 Nova Pro 모델](https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html)을 활용하여 chat, Hybrid 검색 지원하는 RAG를 구현하고, [CRAG](https://github.com/kyopark2014/langgraph-agent/blob/main/corrective-rag-agent.md), [Self RAG](https://github.com/kyopark2014/langgraph-agent/blob/main/self-rag.md), [Self Corrective RAG](https://github.com/kyopark2014/langgraph-agent/blob/main/self-corrective-rag.md)를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 agentic workflow의 4가지 대표적인 패턴인 tool use, reflection, planning, multi-agent collaboration을 Amazon Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Amazon Nova는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow 구현에 적절한 모델입니다.
 
 ## Architecture 개요
 
@@ -82,7 +81,7 @@ msg = readStreamMsg(connectionId, requestId, stream.content)
 
 ### Corrective RAG
 
-Corrective RAG(CRAG)는 retrival/grading 후에 질문을 rewrite한 후 인터넷 검색에서 얻어진 결과로 RAG의 성능을 강화하는 방법입니다. 
+[Corrective RAG(CRAG)](https://github.com/kyopark2014/langgraph-agent/blob/main/corrective-rag-agent.md)는 retrival/grading 후에 질문을 rewrite한 후 인터넷 검색에서 얻어진 결과로 RAG의 성능을 강화하는 방법입니다. 
 
 ![image](https://github.com/user-attachments/assets/27228159-b307-4588-8a8a-61d8deaa90e3)
 
@@ -116,7 +115,7 @@ workflow.add_edge("generate", END)
 
 ### Self RAG
 
-Self RAG는 retrieve/grading 후에 generation을 수행하는데, grading의 결과에 따라 필요시 rewtire후 retrieve를 수행하며, 생성된 결과가 hallucination인지, 답변이 적절한지를 판단하여 필요시 rewtire / retrieve를 반복합니다. 
+[Self RAG](https://github.com/kyopark2014/langgraph-agent/blob/main/self-rag.md)는 retrieve/grading 후에 generation을 수행하는데, grading의 결과에 따라 필요시 rewtire후 retrieve를 수행하며, 생성된 결과가 hallucination인지, 답변이 적절한지를 판단하여 필요시 rewtire / retrieve를 반복합니다. 
 
 ![image](https://github.com/user-attachments/assets/b1f2db6c-f23f-4382-86f6-0fa7d3fe0595)
 
