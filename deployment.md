@@ -2,7 +2,7 @@
 
 ## Bedrock 사용 권한 설정하기
 
-LLM으로 Amazon Nova Pro을 사용하기 위하여, Amazon Bedrock의 us-west-2, us-east-1, us-east-2 리전을 사용합니다. [Model access](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)에 접속해서 [Edit]를 선택하여 "Titan Text Embeddings V2"와 "Amazon Nova Pro"을 Vector Embedding과 LLM을 위해 enable 합니다.
+LLM으로 Amazon Nova Pro을 사용하기 위하여, Amazon Bedrock의 us-west-2, us-east-1, us-east-2 리전을 사용합니다. [Model access](https://us-west-2.console.aws.amazon.com/bedrock/home?region=us-west-2#/modelaccess)에 접속해서 [Edit]를 선택하여 "Titan Text Embeddings V2"와 "Amazon Nova Pro"을 Vector Embedding과 LLM을 위해 enable 합니다.
 
 
 ## 설치하기
@@ -44,7 +44,6 @@ sudo service docker start
 sudo npm install -g aws-cdk --prefix /usr/local
 ```
 
-
 <!--
 
 ## CDK를 이용한 인프라 설치하기
@@ -71,7 +70,6 @@ curl https://raw.githubusercontent.com/kyopark2014/technical-summary/main/resize
 ```text
 chmod a+rx resize.sh && ./resize.sh 80
 ```
-
 -->
 
 
@@ -80,13 +78,13 @@ chmod a+rx resize.sh && ./resize.sh 80
 1) 소스를 다운로드합니다.
 
 ```java
-git clone https://github.com/kyopark2014/langgraph-agent
+git clone https://github.com/kyopark2014/nova-agent
 ```
 
 2) cdk 폴더로 이동하여 필요한 라이브러리를 설치합니다.
 
 ```java
-cd langgraph-agent/cdk-langgraph-agent/ && npm install
+cd langgraph-agent/cdk-nova-agent/ && npm install
 ```
 
 3) CDK 사용을 위해 Boostraping을 수행합니다.
