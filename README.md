@@ -528,5 +528,5 @@ Multi-agent collaboration을 이용해 작성된 보고서의 예는 아래와 �
 2) [Cloud9 Console](https://us-west-2.console.aws.amazon.com/cloud9control/home?region=us-west-2#/)에 접속하여 아래의 명령어로 전체 삭제를 합니다.
 
 ```text
-cd ~/environment/nova-agent/cdk-nova-agent/ && cdk destroy --all
+cd ~/nova-agent/cdk-nova-agent && cdk destroy --all
 ```
