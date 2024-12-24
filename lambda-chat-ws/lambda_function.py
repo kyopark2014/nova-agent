@@ -3042,35 +3042,40 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                 structured_llm = chat.with_structured_output(ResearchKor, include_raw=True)
             else:
                 structured_llm = chat.with_structured_output(Research, include_raw=True)
-                
-            info = structured_llm.invoke(draft)
-            print(f'attempt: {attempt}, info: {info}')
-                
-            if not info['parsed'] == None:
-                parsed_info = info['parsed']
-                # print('reflection: ', parsed_info.reflection)                
-                reflection = [parsed_info.reflection.missing, parsed_info.reflection.advisable]
-                search_queries = parsed_info.search_queries
-                
-                print('reflection: ', parsed_info.reflection)            
-                print('search_queries: ', search_queries)     
-        
-                if isKorean(draft):
-                    translated_search = []
-                    for q in search_queries:
-                        chat = get_chat()
-                        if isKorean(q):
-                            search = traslation(chat, q, "Korean", "English")
-                        else:
-                            search = traslation(chat, q, "English", "Korean")
-                        translated_search.append(search)
-                        
-                    print('translated_search: ', translated_search)
-                    search_queries += translated_search
+            
+            try:
+                info = structured_llm.invoke(draft)
+                print(f'attempt: {attempt}, info: {info}')
+                    
+                if not info['parsed'] == None:
+                    parsed_info = info['parsed']
+                    # print('reflection: ', parsed_info.reflection)                
+                    reflection = [parsed_info.reflection.missing, parsed_info.reflection.advisable]
+                    search_queries = parsed_info.search_queries
+                    
+                    print('reflection: ', parsed_info.reflection)            
+                    print('search_queries: ', search_queries)     
+            
+                    if isKorean(draft):
+                        translated_search = []
+                        for q in search_queries:
+                            chat = get_chat()
+                            if isKorean(q):
+                                search = traslation(chat, q, "Korean", "English")
+                            else:
+                                search = traslation(chat, q, "English", "Korean")
+                            translated_search.append(search)
+                            
+                        print('translated_search: ', translated_search)
+                        search_queries += translated_search
 
-                print('search_queries (mixed): ', search_queries)
-                break
-        
+                    print('search_queries (mixed): ', search_queries)
+                    break
+            except Exception:
+                err_msg = traceback.format_exc()
+                print('error message: ', err_msg)                    
+                raise Exception ("Not able to request to LLM")               
+            
         revision_number = state["revision_number"] if state.get("revision_number") is not None else 1
         return {
             "reflection": reflection,
