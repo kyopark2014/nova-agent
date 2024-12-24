@@ -3054,8 +3054,8 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     reflection = [parsed_info.reflection.missing, parsed_info.reflection.advisable]
                     search_queries = parsed_info.search_queries
                     
-                    print('reflection: ', parsed_info.reflection)            
-                    print('search_queries: ', search_queries)     
+                    print('reflection: ', parsed_info.reflection)
+                    print('search_queries: ', search_queries)
             
                     if isKorean(draft):
                         translated_search = []
@@ -3073,6 +3073,9 @@ def run_long_form_writing_agent(connectionId, requestId, query):
                     print('search_queries (mixed): ', search_queries)
                     break
             except Exception:
+                print('length: ', len(draft))    
+                print('draft: ', draft)
+
                 err_msg = traceback.format_exc()
                 print('error message: ', err_msg)                    
                 raise Exception ("Not able to request to LLM")               
@@ -3164,7 +3167,6 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('search_queries: ', search_queries)
         print('reflection: ', reflection)
                             
-        # web search
         idx = config.get("configurable", {}).get("idx")
         print('revise_draft idx: ', idx)
         update_state_message(f"revising... (retrieve-{idx})", config)
