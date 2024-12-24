@@ -3170,14 +3170,18 @@ def run_long_form_writing_agent(connectionId, requestId, query):
         print('revise_draft idx: ', idx)
         update_state_message(f"revising... (retrieve-{idx})", config)
         
-        reference = state['reference'] if 'reference' in state else []            
+        # reference = state['reference'] if 'reference' in state else []     
+        if 'reference' in state       
+            reference = state['reference'] 
+        else:
+            reference = []            
 
         if len(search_queries) and len(reflection):
             docs = retrieve_docs(search_queries, config)        
             print('docs: ', docs)
         
             reference += docs
-            print('len(reference): ', reference)
+            print('len(reference): ', len(reference))
         
             content = []   
             if len(docs):
