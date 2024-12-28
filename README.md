@@ -1,5 +1,10 @@
 # Nova Pro 활용하기
 
+<p align="left">
+    <a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fkyopark2014%2Fnova-agent&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com"/></a>
+    <img alt="License" src="https://img.shields.io/badge/LICENSE-MIT-green">
+</p>
+
 여기에서는 [Nova Pro 모델](https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html)을 활용하여 chat과 Hybrid 검색 지원하는 RAG를 구현하고, [CRAG](https://github.com/kyopark2014/langgraph-agent/blob/main/corrective-rag-agent.md), [Self RAG](https://github.com/kyopark2014/langgraph-agent/blob/main/self-rag.md), [Self Corrective RAG](https://github.com/kyopark2014/langgraph-agent/blob/main/self-corrective-rag.md)를 이용해 RAG의 성능을 향상시키는 방법에 대해 설명합니다. 또한 복잡한 application을 구현할 수 있는 agentic workflow의 4가지 대표적인 디자인 패턴인 [tool use](https://github.com/kyopark2014/langgraph-agent?tab=readme-ov-file#tool-use), [reflection](https://github.com/kyopark2014/langgraph-agent?tab=readme-ov-file#reflection), [planning](https://github.com/kyopark2014/langgraph-agent?tab=readme-ov-file#plan-and-execute), [multi-agent collaboration](https://github.com/kyopark2014/langgraph-agent?tab=readme-ov-file#multi-agent-collaboration)을 Nova Pro를 이용해 구현합니다. Workflow는 적절한 task들과 반복을 통해 LLM의 결과를 향상시키지만 하나의 job을 수행하기 위해 여러번 LLM을 호출하여야 하므로 지연시간이 증가합니다. Nova Pro는 다른 동급의 LLM 대비 2배 빠르고 가격은 1/3이므로 workflow 구현에 적절한 모델입니다.
 
 ## Architecture 개요
