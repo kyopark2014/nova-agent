@@ -256,8 +256,7 @@ connection_url = os.environ.get('connection_url')
 client = boto3.client('apigatewaymanagementapi', endpoint_url=connection_url)
 print('connection_url: ', connection_url)
 
-HUMAN_PROMPT = "\n\nHuman:"
-AI_PROMPT = "\n\nAssistant:"
+STOP_SEQUENCE = '"\n\n<thinking>", "\n<thinking>", " <thinking>"'
 
 map_chain = dict() 
 MSG_LENGTH = 100
@@ -292,7 +291,7 @@ def get_chat():
         "temperature":0.1,
         "top_k":250,
         "top_p":0.9,
-        "stop_sequences": [HUMAN_PROMPT]
+        "stop_sequences": [STOP_SEQUENCE]
     }
     # print('parameters: ', parameters)
 
@@ -330,7 +329,7 @@ def get_multi_region_chat(models, selected):
         "temperature":0.1,
         "top_k":250,
         "top_p":0.9,
-        "stop_sequences": [HUMAN_PROMPT]
+        "stop_sequences": [STOP_SEQUENCE]
     }
     # print('parameters: ', parameters)
 
@@ -368,7 +367,7 @@ def get_multimodal():
         "temperature":0.1,
         "top_k":250,
         "top_p":0.9,
-        "stop_sequences": [HUMAN_PROMPT]
+        "stop_sequences": [STOP_SEQUENCE]
     }
     # print('parameters: ', parameters)
 
@@ -1725,6 +1724,162 @@ class GradeDocuments(BaseModel):
     """Binary score for relevance check on retrieved documents."""
 
     binary_score: str = Field(description="Documents are relevant to the question, 'yes' or 'no'")
+
+####################### LangGraph #######################
+# Chat Agent Executor
+#########################################################
+def run_agent_executor(connectionId, requestId, query):        
+    chatModel = get_chat()     
+    model = chatModel.bind_tools(tools)
+
+    class State(TypedDict):
+        # messages: Annotated[Sequence[BaseMessage], operator.add]
+        messages: Annotated[list, add_messages]
+
+    tool_node = ToolNode(tools)
+
+    def should_continue(state: State) -> Literal["continue", "end"]:
+        print("###### should_continue ######")
+
+        print('state: ', state)
+        messages = state["messages"]    
+
+        last_message = messages[-1]
+        print('last_message: ', last_message)
+        
+        # print('last_message: ', last_message)
+        
+        # if not isinstance(last_message, ToolMessage):
+        #     return "end"
+        # else:                
+        #     return "continue"
+        if isinstance(last_message, ToolMessage) or last_message.tool_calls:
+            print(f"tool_calls: ", last_message.tool_calls)
+
+            for message in last_message.tool_calls:
+                print(f"tool name: {message['name']}, args: {message['args']}")
+                # update_state_message(f"calling... {message['name']}", config)
+
+            print(f"--- CONTINUE: {last_message.tool_calls[-1]['name']} ---")
+            return "continue"
+        
+        #if not last_message.tool_calls:
+        else:
+            print("Final: ", last_message.content)
+            print("--- END ---")
+            return "end"
+
+    def call_model(state: State, config):
+        print("###### call_model ######")
+        print('state: ', state["messages"])
+                
+        if isKorean(state["messages"][0].content)==True:
+            system = (
+                "당신의 이름은 서연이고, 질문에 친근한 방식으로 대답하도록 설계된 대화형 AI입니다."
+                "상황에 맞는 구체적인 세부 정보를 충분히 제공합니다."
+                "모르는 질문을 받으면 솔직히 모른다고 말합니다."
+            )
+        else: 
+            system = (            
+                "You are a conversational AI designed to answer in a friendly way to a question."
+                "If you don't know the answer, just say that you don't know, don't try to make up an answer."
+            )
+
+        for attempt in range(3):   
+            print('attempt: ', attempt)
+            try:
+                prompt = ChatPromptTemplate.from_messages(
+                    [
+                        ("system", system),
+                        MessagesPlaceholder(variable_name="messages"),
+                    ]
+                )
+                chain = prompt | model
+                    
+                response = chain.invoke(state["messages"])
+                print('call_model response: ', response)
+
+                if isinstance(response.content, list):            
+                    for re in response.content:
+                        if "type" in re:
+                            if re['type'] == 'text':
+                                print(f"--> {re['type']}: {re['text']}")
+
+                                status = re['text']
+                                print('status: ',status)
+                                
+                                status = status.replace('`','')
+                                status = status.replace('\"','')
+                                status = status.replace("\'",'')
+                                
+                                print('status: ',status)
+                                if status.find('<thinking>') != -1:
+                                    print('Remove <thinking> tag.')
+                                    status = status[status.find('<thinking>')+11:status.find('</thinking>')]
+                                    print('status without tag: ', status)
+
+                            elif re['type'] == 'tool_use':                
+                                print(f"--> {re['type']}: {re['name']}, {re['input']}")
+                            else:
+                                print(re)
+                        else: # answer
+                            print(response.content)
+                break
+            except Exception:
+                response = AIMessage(content="답변을 찾지 못하였습니다.")
+
+                err_msg = traceback.format_exc()
+                print('error message: ', err_msg)
+                # raise Exception ("Not able to request to LLM")
+
+        return {"messages": [response]}
+
+    def buildChatAgent():
+        workflow = StateGraph(State)
+
+        workflow.add_node("agent", call_model)
+        workflow.add_node("action", tool_node)
+        workflow.add_edge(START, "agent")
+        workflow.add_conditional_edges(
+            "agent",
+            should_continue,
+            {
+                "continue": "action",
+                "end": END,
+            },
+        )
+        workflow.add_edge("action", "agent")
+
+        return workflow.compile()
+
+    # initiate
+    global reference_docs, contentList
+    reference_docs = []
+    contentList = []
+
+    # workflow 
+    app = buildChatAgent()
+            
+    inputs = [HumanMessage(content=query)]
+    config = {
+        "recursion_limit": 50,
+        "requestId": requestId,
+        "connectionId": connectionId
+    }
+
+    message = ""
+    for event in app.stream({"messages": inputs}, config, stream_mode="values"):   
+        # print('event: ', event)
+        
+        if "answer" in event:
+            message = event["answer"]
+        else:
+            message = event["messages"][-1].content
+        # print('message: ', message)
+
+    msg = readStreamMsg(connectionId, requestId, message)
+    
+    return msg
 
 ####################### LangGraph #######################
 # Chat Agent Executor 
@@ -4288,12 +4443,12 @@ def getResponse(connectionId, jsonBody):
                 
                 ########## Agent ##########
                 elif convType == 'agent-executor':  # Tool Use
-                    msg = run_agent_executor2(connectionId, requestId, text)
+                    msg = run_agent_executor(connectionId, requestId, text)
                         
                 elif convType == 'agent-executor-chat':
                     revised_question = revise_question(connectionId, requestId, chat, text)     
                     print('revised_question: ', revised_question)  
-                    msg = run_agent_executor2(connectionId, requestId, revised_question)
+                    msg = run_agent_executor(connectionId, requestId, revised_question)
                     
                 elif convType == 'agent-knowledge-guru':  # Refection: knowledge guru 
                     msg = run_knowledge_guru(connectionId, requestId, text)      
