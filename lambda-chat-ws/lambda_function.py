@@ -1027,6 +1027,10 @@ def search_by_tavily(keyword: str) -> str:
             print('error message: ', err_msg)                    
             # raise Exception ("Not able to request to tavily")   
         
+    if answer == "":
+        # answer = "No relevant documents found." 
+        answer = "관련된 정보를 찾지 못하였습니다."
+
     return answer
 
 @tool    
@@ -1063,8 +1067,9 @@ def search_by_opensearch(keyword: str) -> str:
         
         relevant_context = relevant_context + f"{content}\n\n"
 
-    if len(relevant_docs) == 0:
-        relevant_context = "No relevant documents found."
+    if len(filtered_docs) == 0:
+        #relevant_context = "No relevant documents found."
+        relevant_context = "관련된 정보를 찾지 못하였습니다."
         print('relevant_context: ', relevant_context)
         
     return relevant_context
